@@ -1,0 +1,95 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 624c9b7b91c877f4a912505eb0b3bdc5, type: 3}
+  m_Name: CarCatalog
+  m_EditorClassIdentifier: Assembly-CSharp::CarCatalog
+  cars:
+  - id: 0
+    displayName: Street
+    prefab: {fileID: 6558350185343971735, guid: d017faad03b9aa946ab12ed85bb3607f,
+      type: 3}
+    thumbnail: {fileID: -692078636420456154, guid: 0f3edf357ba89ce46a716459c7b3b53e,
+      type: 3}
+    price: 0
+    unlockedByDefault: 1
+  - id: 1
+    displayName: Performance 1
+    prefab: {fileID: 6558350185343971735, guid: 61c4b11e1f5ce224da124d7493427e35,
+      type: 3}
+    thumbnail: {fileID: -4087920682162522074, guid: d86ab9fcd995a0e49a5d09b7793d4915,
+      type: 3}
+    price: 10000
+    unlockedByDefault: 0
+  - id: 2
+    displayName: Performance 2
+    prefab: {fileID: 6558350185343971735, guid: 60c6e20633b1f544595b4fc54ed4d157,
+      type: 3}
+    thumbnail: {fileID: -4822002339657365305, guid: 5e3b7ae35e122ae468b66d6ae5fc2305,
+      type: 3}
+    price: 10000
+    unlockedByDefault: 0
+  - id: 3
+    displayName: Super 1
+    prefab: {fileID: 6558350185343971735, guid: ab48ac2ae2dcabc4bb29ce7566eb28f2,
+      type: 3}
+    thumbnail: {fileID: -1728565786103156028, guid: 627bcd882300d404e891a7b7fa249126,
+      type: 3}
+    price: 60000
+    unlockedByDefault: 0
+  - id: 4
+    displayName: Super 2
+    prefab: {fileID: 6558350185343971735, guid: a9d528b41b502b942949e8e0e024cc76,
+      type: 3}
+    thumbnail: {fileID: 8987732553812351499, guid: b39e9367113dee34aadeaa5d3e2104ea,
+      type: 3}
+    price: 60000
+    unlockedByDefault: 0
+  - id: 5
+    displayName: Exotic 1
+    prefab: {fileID: 6558350185343971735, guid: 827e9a36fc6b5cc4594ae49a6daa91d0,
+      type: 3}
+    thumbnail: {fileID: 7086713554667066470, guid: 01afc081f01137248bf0fdb0f7080764,
+      type: 3}
+    price: 160000
+    unlockedByDefault: 0
+  - id: 6
+    displayName: Exotic 2
+    prefab: {fileID: 6558350185343971735, guid: b62b137812172a94f944fc0947cebb61,
+      type: 3}
+    thumbnail: {fileID: -9146520813494707698, guid: 9aa8dc55a7551f440a982354bfdbcef5,
+      type: 3}
+    price: 160000
+    unlockedByDefault: 0
+  - id: 7
+    displayName: Exotic 3
+    prefab: {fileID: 6558350185343971735, guid: 81b5181e92ec51b4b827b9ee4e97aff2,
+      type: 3}
+    thumbnail: {fileID: -4161031970589558192, guid: 50f8cf754fca7ee4cac924af3f1c6d82,
+      type: 3}
+    price: 160000
+    unlockedByDefault: 0
+  - id: 8
+    displayName: Hyper 1
+    prefab: {fileID: 6558350185343971735, guid: a00439e84ea38d34c99e09675dcda789,
+      type: 3}
+    thumbnail: {fileID: -6424815365582245026, guid: ed8f0a58b6298324d9fd445f690536b5,
+      type: 3}
+    price: 400000
+    unlockedByDefault: 0
+  - id: 9
+    displayName: Hyper 2
+    prefab: {fileID: 6558350185343971735, guid: e64303a95a5985e4d95e7da042da3f3e,
+      type: 3}
+    thumbnail: {fileID: -7732045425276702371, guid: 6da49a95052de2945bdf90469d529fca,
+      type: 3}
+    price: 400000
+    unlockedByDefault: 0
