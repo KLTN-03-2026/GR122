@@ -6,6 +6,7 @@ using System.Linq;
 public class CarAIHandler : MonoBehaviour
 {
     public enum AIMode { followPlayer, followWaypoints, followMouse };
+    public enum PathMode { Normal, Recover }
 
     [Header("AI settings")]
     public AIMode aiMode;
@@ -14,103 +15,248 @@ public class CarAIHandler : MonoBehaviour
     [Range(0.0f, 1.0f)]
     public float skillLevel = 1.0f;
 
-    // NEW: đánh dấu nếu đây là 1 cop (sẽ lấy target từ CopTargetManager)
     [Header("Cop settings")]
     public bool isCop = false;
 
+    [Header("Recovery settings")]
+    public RacePath racePath;
+    public float recoverBackwardDuration = 2.5f;
+    public float recoverPathDuration = 5.0f;
 
-    //Local variables
+    [Header("Stuck detection")]
+    public float stuckCheckInterval = 1.0f;      // Thời gian giữa các lần kiểm tra
+    public float stuckPositionThreshold = 0.5f;  // Nếu di chuyển dưới ngưỡng này thì coi như stuck
+    public float stuckRotationThreshold = 5.0f;  // Nếu xoay dưới ngưỡng này (độ) thì coi như stuck
+    public int stuckRequiredCount = 3;            // Số lần kiểm tra liên tiếp bị stuck để kích hoạt recovery
+
+    // Local variables
     Vector3 targetPosition = Vector3.zero;
     Transform targetTransform = null;
-    float orignalMaximumSpeed = 0;
+    float originalMaximumSpeed = 0;
 
-    //Stuck handling
+    // Stuck handling mới
+    Vector3 lastPosition;
+    float lastRotationZ;
+    float stuckTimer = 0f;
+    int stuckCount = 0;
+    bool isCheckingStuck = true;
+
+    // Temporary waypoints (cho stuck cũ - giữ lại để tương thích)
     bool isRunningStuckCheck = false;
     bool isFirstTemporaryWaypoint = false;
-    int stuckCheckCounter = 0;
     List<Vector2> temporaryWaypoints = new List<Vector2>();
     float angleToTarget = 0;
 
-    //Avoidance
+    // Avoidance
     Vector2 avoidanceVectorLerped = Vector3.zero;
 
-    //Waypoints
+    // Waypoints
+    PathMode currentPathMode = PathMode.Normal;
+    WaypointNode[] normalWaypoints;
+    WaypointNode[] recoverWaypoints;
     WaypointNode currentWaypoint = null;
     WaypointNode previousWaypoint = null;
-    WaypointNode[] allWayPoints;
 
-    //Colliders
+    // Recovery state
+    bool isRecovering = false;
+    float recoverTimer = 0f;
+    bool isBackingUp = false;
+    float backupTimer = 0f;
+
+    // Components
     PolygonCollider2D polygonCollider2D;
-
-    //Components
     TopDownCarController topDownCarController;
     AStarLite aStarLite;
 
-    //Awake is called when the script instance is being loaded.
     void Awake()
     {
         topDownCarController = GetComponent<TopDownCarController>();
-        allWayPoints = FindObjectsOfType<WaypointNode>();
-
         aStarLite = GetComponent<AStarLite>();
-
         polygonCollider2D = GetComponentInChildren<PolygonCollider2D>();
+        originalMaximumSpeed = maxSpeed;
 
-        orignalMaximumSpeed = maxSpeed;
+        if (racePath == null)
+            racePath = FindObjectOfType<RacePath>();
+
+        if (racePath != null)
+        {
+            normalWaypoints = racePath.NormalWaypointNodes;
+            recoverWaypoints = racePath.RecoverWaypointNodes;
+        }
+        else
+        {
+            normalWaypoints = FindObjectsOfType<WaypointNode>();
+            recoverWaypoints = new WaypointNode[0];
+        }
     }
 
-    // Start is called before the first frame update
     void Start()
     {
         SetMaxSpeedBasedOnSkillLevel(maxSpeed);
+        if (normalWaypoints != null && normalWaypoints.Length > 0)
+            currentWaypoint = FindClosestWayPoint(normalWaypoints);
+
+        // Khởi tạo lastPosition và lastRotationZ
+        lastPosition = transform.position;
+        lastRotationZ = transform.rotation.eulerAngles.z;
+        stuckTimer = stuckCheckInterval;
     }
 
-    // Update is called once per frame and is frame dependent
     void FixedUpdate()
     {
         Vector2 inputVector = Vector2.zero;
 
-        switch (aiMode)
+        // Kiểm tra stuck dựa trên transform (chỉ khi không đang recovery)
+        if (!isRecovering && isCheckingStuck)
+            CheckStuckByTransform();
+
+        if (isRecovering)
         {
-            case AIMode.followPlayer:
-                FollowPlayer();
-                break;
-
-            case AIMode.followWaypoints:
-                if (temporaryWaypoints.Count == 0)
-                    FollowWaypoints();
-                else FollowTemporaryWayPoints();
-
-                break;
-
-            case AIMode.followMouse:
-                FollowMousePosition();
-                break;
+            HandleRecovery();
+            if (currentWaypoint != null)
+                targetPosition = currentWaypoint.transform.position;
+        }
+        else
+        {
+            switch (aiMode)
+            {
+                case AIMode.followPlayer:
+                    FollowPlayer();
+                    break;
+                case AIMode.followWaypoints:
+                    if (temporaryWaypoints.Count == 0)
+                        FollowWaypoints();
+                    else
+                        FollowTemporaryWayPoints();
+                    break;
+                case AIMode.followMouse:
+                    FollowMousePosition();
+                    break;
+            }
         }
 
         inputVector.x = TurnTowardTarget();
         inputVector.y = ApplyThrottleOrBrake(inputVector.x);
 
-        //If the AI is applying throttle but not manging to get any speed then lets run our stuck check.
-        if (topDownCarController.GetVelocityMagnitude() < 0.5f && Mathf.Abs(inputVector.y) > 0.01f && !isRunningStuckCheck)
-            StartCoroutine(StuckCheckCO());
-
-        //Handle special case where the car has reversed for a while then it should check if it is still stuck. If it is not then it will drive forward again.
-        if (stuckCheckCounter >= 4 && !isRunningStuckCheck)
-            StartCoroutine(StuckCheckCO());
-
-
-        //Send the input to the car controller.
         topDownCarController.SetInputVector(inputVector);
     }
 
-    //AI follows player
+    #region Stuck Detection mới dùng transform
+    void CheckStuckByTransform()
+    {
+        stuckTimer -= Time.fixedDeltaTime;
+        if (stuckTimer <= 0f)
+        {
+            stuckTimer = stuckCheckInterval;
+
+            Vector3 currentPos = transform.position;
+            float currentRotZ = transform.rotation.eulerAngles.z;
+            float deltaPos = Vector3.Distance(currentPos, lastPosition);
+            float deltaRot = Mathf.Abs(Mathf.DeltaAngle(currentRotZ, lastRotationZ));
+
+            if (deltaPos < stuckPositionThreshold && deltaRot < stuckRotationThreshold)
+            {
+                stuckCount++;
+                if (stuckCount >= stuckRequiredCount && !isRecovering)
+                {
+                    StartRecovery();
+                    stuckCount = 0; // reset sau khi kích hoạt
+                }
+            }
+            else
+            {
+                stuckCount = 0;
+            }
+
+            lastPosition = currentPos;
+            lastRotationZ = currentRotZ;
+        }
+    }
+    #endregion
+
+    #region Recovery Logic
+    void HandleRecovery()
+    {
+        if (isBackingUp)
+        {
+            backupTimer -= Time.fixedDeltaTime;
+            if (backupTimer <= 0f)
+            {
+                isBackingUp = false;
+                SwitchToRecoverPath();
+            }
+            else
+            {
+                Vector3 backwardTarget = transform.position - transform.up * 3f;
+                targetPosition = backwardTarget;
+            }
+            return;
+        }
+
+        recoverTimer -= Time.fixedDeltaTime;
+        if (recoverTimer <= 0f)
+        {
+            ExitRecovery();
+        }
+        else
+        {
+            if (currentWaypoint == null && recoverWaypoints.Length > 0)
+                currentWaypoint = FindClosestWayPoint(recoverWaypoints);
+            FollowWaypoints();
+        }
+    }
+
+    void StartRecovery()
+    {
+        if (isRecovering) return;
+        isRecovering = true;
+        isBackingUp = true;
+        backupTimer = recoverBackwardDuration;
+        temporaryWaypoints.Clear();
+        // Dừng mọi coroutine stuck cũ nếu có
+        if (isRunningStuckCheck) StopCoroutine(StuckCheckCO());
+        isRunningStuckCheck = false;
+        stuckCount = 0;
+    }
+
+    void SwitchToRecoverPath()
+    {
+        currentPathMode = PathMode.Recover;
+        if (recoverWaypoints != null && recoverWaypoints.Length > 0)
+        {
+            currentWaypoint = FindClosestWayPoint(recoverWaypoints);
+            previousWaypoint = currentWaypoint;
+        }
+        recoverTimer = recoverPathDuration;
+    }
+
+    void ExitRecovery()
+    {
+        isRecovering = false;
+        isBackingUp = false;
+        currentPathMode = PathMode.Normal;
+        if (normalWaypoints != null && normalWaypoints.Length > 0)
+        {
+            currentWaypoint = FindClosestWayPoint(normalWaypoints);
+            previousWaypoint = currentWaypoint;
+        }
+        else
+        {
+            currentWaypoint = null;
+        }
+        stuckCount = 0;
+        // Reset last position để tránh stuck ngay sau khi hồi phục
+        lastPosition = transform.position;
+        lastRotationZ = transform.rotation.eulerAngles.z;
+        stuckTimer = stuckCheckInterval;
+    }
+    #endregion
+
+    #region AI Behaviors
     void FollowPlayer()
     {
-        // Nếu đây là cop -> lấy target từ CopTargetManager
         if (isCop)
         {
-            // Nếu chưa có target thì yêu cầu manager cấp
             if (targetTransform == null)
             {
                 if (CopTargetManager.Instance != null)
@@ -124,14 +270,12 @@ public class CarAIHandler : MonoBehaviour
                 }
                 else
                 {
-                    // fallback: nếu manager không tồn tại thì vẫn tìm player theo tag
                     var p = GameObject.FindGameObjectWithTag("Player");
                     if (p != null) targetTransform = p.transform;
                 }
             }
             else
             {
-                // nếu target không còn hợp lệ (bị disable/hủy) thì release và null
                 if (!targetTransform.gameObject.activeInHierarchy)
                 {
                     CopTargetManager.Instance?.ReleaseTarget(targetTransform, this);
@@ -142,71 +286,54 @@ public class CarAIHandler : MonoBehaviour
                     targetPosition = targetTransform.position;
                 }
             }
-
             return;
         }
 
-    // Hành vi cũ cho non-cop: follow object tag "Player"
-    if (targetTransform == null)
-        targetTransform = GameObject.FindGameObjectWithTag("Player")?.transform;
+        if (targetTransform == null)
+            targetTransform = GameObject.FindGameObjectWithTag("Player")?.transform;
+        if (targetTransform != null)
+            targetPosition = targetTransform.position;
+    }
 
-    if (targetTransform != null)
-        targetPosition = targetTransform.position;
-}
-
-    //AI follows waypoints
     void FollowWaypoints()
     {
-        //Pick the cloesest waypoint if we don't have a waypoint set.
+        WaypointNode[] activeWaypoints = (currentPathMode == PathMode.Normal) ? normalWaypoints : recoverWaypoints;
+        if (activeWaypoints == null || activeWaypoints.Length == 0) return;
+
         if (currentWaypoint == null)
         {
-            currentWaypoint = FindClosestWayPoint();
+            currentWaypoint = FindClosestWayPoint(activeWaypoints);
             previousWaypoint = currentWaypoint;
         }
 
-        //Set the target on the waypoints position
         if (currentWaypoint != null)
         {
-            //Set the target position of for the AI. 
             targetPosition = currentWaypoint.transform.position;
-
-            //Store how close we are to the target
             float distanceToWayPoint = (targetPosition - transform.position).magnitude;
 
-            //Check if we are close enough to consider that we have reached the waypoint
             if (distanceToWayPoint <= currentWaypoint.minDistanceToReachWaypoint)
             {
                 if (currentWaypoint.maxSpeed > 0)
                     SetMaxSpeedBasedOnSkillLevel(currentWaypoint.maxSpeed);
-                else SetMaxSpeedBasedOnSkillLevel(1000);
+                else
+                    SetMaxSpeedBasedOnSkillLevel(1000);
 
-                //Store the current waypoint as previous before we assign a new current one.
                 previousWaypoint = currentWaypoint;
-
-                //If we are close enough then follow to the next waypoint, if there are multiple waypoints then pick one at random.
-                currentWaypoint = currentWaypoint.nextWaypointNode[Random.Range(0, currentWaypoint.nextWaypointNode.Length)];
+                if (currentWaypoint.nextWaypointNode != null && currentWaypoint.nextWaypointNode.Length > 0)
+                    currentWaypoint = currentWaypoint.nextWaypointNode[Random.Range(0, currentWaypoint.nextWaypointNode.Length)];
+                else
+                    currentWaypoint = null;
             }
         }
     }
 
-    //AI follows waypoints
     void FollowTemporaryWayPoints()
     {
-        //Set the target position of for the AI. 
+        if (temporaryWaypoints.Count == 0) return;
         targetPosition = temporaryWaypoints[0];
-
-        //Store how close we are to the target
         float distanceToWayPoint = (targetPosition - transform.position).magnitude;
-
-        //Drive a bit slower than usual
         SetMaxSpeedBasedOnSkillLevel(5);
-
-        //Check if we are close enough to consider that we have reached the waypoint
-        float minDistanceToReachWaypoint = 1.5f;
-
-        if (!isFirstTemporaryWaypoint)
-            minDistanceToReachWaypoint = 3.0f;
-
+        float minDistanceToReachWaypoint = isFirstTemporaryWaypoint ? 3.0f : 1.5f;
         if (distanceToWayPoint <= minDistanceToReachWaypoint)
         {
             temporaryWaypoints.RemoveAt(0);
@@ -214,22 +341,18 @@ public class CarAIHandler : MonoBehaviour
         }
     }
 
-    //AI follows the mouse position
     void FollowMousePosition()
     {
-        //Take the mouse position in screen space and convert it to world space
         Vector3 worldPosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-
-        //Set the target position of for the AI. 
         targetPosition = worldPosition;
     }
+    #endregion
 
-    //Find the cloest Waypoint to the AI
-    WaypointNode FindClosestWayPoint()
+    #region Helpers
+    WaypointNode FindClosestWayPoint(WaypointNode[] waypointsArray)
     {
-        return allWayPoints
-            .OrderBy(t => Vector3.Distance(transform.position, t.transform.position))
-            .FirstOrDefault();
+        if (waypointsArray == null || waypointsArray.Length == 0) return null;
+        return waypointsArray.OrderBy(t => Vector3.Distance(transform.position, t.transform.position)).FirstOrDefault();
     }
 
     float TurnTowardTarget()
@@ -237,192 +360,106 @@ public class CarAIHandler : MonoBehaviour
         Vector2 vectorToTarget = targetPosition - transform.position;
         vectorToTarget.Normalize();
 
-        //Apply avoidance to steering
         if (isAvoidingCars && !topDownCarController.IsJumping())
             AvoidCars(vectorToTarget, out vectorToTarget);
 
-        //Calculate an angle towards the target 
-        angleToTarget = Vector2.SignedAngle(transform.up, vectorToTarget);
-        angleToTarget *= -1;
-
-        //We want the car to turn as much as possible if the angle is greater than 45 degrees and we wan't it to smooth out so if the angle is small we want the AI to make smaller corrections. 
+        angleToTarget = Vector2.SignedAngle(transform.up, vectorToTarget) * -1;
         float steerAmount = angleToTarget / 45.0f;
-
-        //Clamp steering to between -1 and 1.
         steerAmount = Mathf.Clamp(steerAmount, -1.0f, 1.0f);
-
         return steerAmount;
     }
 
     float ApplyThrottleOrBrake(float inputX)
     {
-        //If we are going too fast then do not accelerate further. 
         if (topDownCarController.GetVelocityMagnitude() > maxSpeed)
             return 0;
 
-        //Apply throttle forward based on how much the car wants to turn. If it's a sharp turn this will cause the car to apply less speed forward. We store this as reduceSpeedDueToCornering so we can use it togehter with the skill level
-        float reduceSpeedDueToCornering = Mathf.Abs(inputX) / 1.0f;
+        if (isBackingUp)
+            return -0.8f;
 
-        //Apply throttle based on cornering and skill.
+        float reduceSpeedDueToCornering = Mathf.Abs(inputX) / 1.0f;
         float throttle = 1.05f - reduceSpeedDueToCornering * skillLevel;
 
-        //Handle throttle differently when we are following temp waypoints
-        if (temporaryWaypoints.Count() != 0)
+        if (temporaryWaypoints.Count != 0)
         {
-            //If the angle is larger to reach the target the it is better to reverse. 
-            if (angleToTarget > 70)
-                throttle = throttle * -1;
-            else if (angleToTarget < -70)
-                throttle = throttle * -1;
-            //If we are still stuck after a number of attempts then just reverse. 
-            else if (stuckCheckCounter > 3)
+            if (angleToTarget > 70 || angleToTarget < -70)
                 throttle = throttle * -1;
         }
 
-        //Apply throttle based on cornering and skill.
         return throttle;
     }
 
     void SetMaxSpeedBasedOnSkillLevel(float newSpeed)
     {
-        maxSpeed = Mathf.Clamp(newSpeed, 0, orignalMaximumSpeed);
-
+        maxSpeed = Mathf.Clamp(newSpeed, 0, originalMaximumSpeed);
         float skillbasedMaxiumSpeed = Mathf.Clamp(skillLevel, 0.3f, 1.0f);
         maxSpeed = maxSpeed * skillbasedMaxiumSpeed;
     }
+    #endregion
 
-
-    //Finds the nearest point on a line. 
+    #region Avoidance & Stuck (cũ giữ lại để tương thích nếu cần)
     Vector2 FindNearestPointOnLine(Vector2 lineStartPosition, Vector2 lineEndPosition, Vector2 point)
     {
-        //Get heading as a vector
         Vector2 lineHeadingVector = (lineEndPosition - lineStartPosition);
-
-        //Store the max distance
         float maxDistance = lineHeadingVector.magnitude;
         lineHeadingVector.Normalize();
-
-        //Do projection from the start position to the point
         Vector2 lineVectorStartToPoint = point - lineStartPosition;
         float dotProduct = Vector2.Dot(lineVectorStartToPoint, lineHeadingVector);
-
-        //Clamp the dot product to maxDistance
         dotProduct = Mathf.Clamp(dotProduct, 0f, maxDistance);
-
         return lineStartPosition + lineHeadingVector * dotProduct;
     }
 
-    //Checks for cars ahead of the car.
     bool IsCarsInFrontOfAICar(out Vector3 position, out Vector3 otherCarRightVector)
     {
-        //Disable the cars own collider to avoid having the AI car detect itself. 
         polygonCollider2D.enabled = false;
-
-        //Perform the circle cast in front of the car with a slight offset forward and only in the Car layer
         RaycastHit2D raycastHit2d = Physics2D.CircleCast(transform.position + transform.up * 0.5f, 1.2f, transform.up, 12, 1 << LayerMask.NameToLayer("Car"));
-
-        //Enable the colliders again so the car can collide and other cars can detect it.  
         polygonCollider2D.enabled = true;
 
         if (raycastHit2d.collider != null)
         {
-            //Draw a red line showing how long the detection is, make it red since we have detected another car
             Debug.DrawRay(transform.position, transform.up * 12, Color.red);
-
             position = raycastHit2d.collider.transform.position;
             otherCarRightVector = raycastHit2d.collider.transform.right;
             return true;
         }
         else
         {
-            //We didn't detect any other car so draw black line with the distance that we use to check for other cars. 
             Debug.DrawRay(transform.position, transform.up * 12, Color.black);
+            position = Vector3.zero;
+            otherCarRightVector = Vector3.zero;
+            return false;
         }
-
-        //No car was detected but we still need assign out values so lets just return zero. 
-        position = Vector3.zero;
-        otherCarRightVector = Vector3.zero;
-
-        return false;
     }
 
     void AvoidCars(Vector2 vectorToTarget, out Vector2 newVectorToTarget)
     {
         if (IsCarsInFrontOfAICar(out Vector3 otherCarPosition, out Vector3 otherCarRightVector))
         {
-            Vector2 avoidanceVector = Vector2.zero;
-
-            //Calculate the reflecing vector if we would hit the other car. 
-            avoidanceVector = Vector2.Reflect((otherCarPosition - transform.position).normalized, otherCarRightVector);
-
+            Vector2 avoidanceVector = Vector2.Reflect((otherCarPosition - transform.position).normalized, otherCarRightVector);
             float distanceToTarget = (targetPosition - transform.position).magnitude;
-
-            //We want to be able to control how much desire the AI has to drive towards the waypoint vs avoiding the other cars. 
-            //As we get closer to the waypoint the desire to reach the waypoint increases.
             float driveToTargetInfluence = 6.0f / distanceToTarget;
-
-            //Ensure that we limit the value to between 30% and 100% as we always want the AI to desire to reach the waypoint.  
             driveToTargetInfluence = Mathf.Clamp(driveToTargetInfluence, 0.30f, 1.0f);
-
-            //The desire to avoid the car is simply the inverse to reach the waypoint
             float avoidanceInfluence = 1.0f - driveToTargetInfluence;
-
-            //Reduce jittering a little bit by using a lerp
             avoidanceVectorLerped = Vector2.Lerp(avoidanceVectorLerped, avoidanceVector, Time.fixedDeltaTime * 4);
-
-            //Calculate a new vector to the target based on the avoidance vector and the desire to reach the waypoint
             newVectorToTarget = (vectorToTarget * driveToTargetInfluence + avoidanceVector * avoidanceInfluence);
             newVectorToTarget.Normalize();
-
-            //Draw the vector which indicates the avoidance vector in green
             Debug.DrawRay(transform.position, avoidanceVector * 10, Color.green);
-
-            //Draw the vector that the car will actually take in yellow. 
             Debug.DrawRay(transform.position, newVectorToTarget * 10, Color.yellow);
-
-            //we are done so we can return now. 
             return;
         }
-
-        //We need assign a default value if we didn't hit any cars before we exit the function. 
         newVectorToTarget = vectorToTarget;
     }
 
+    // Coroutine cũ vẫn giữ nhưng không dùng nữa, có thể bỏ nhưng để tránh lỗi tham chiếu
     IEnumerator StuckCheckCO()
     {
-        Vector3 initialStuckPosition = transform.position;
-
-        isRunningStuckCheck = true;
-
-        yield return new WaitForSeconds(0.7f);
-
-        //if we have not moved for a second then we are stuck
-        if ((transform.position - initialStuckPosition).sqrMagnitude < 3)
-        {
-            //Get a path to the desired position
-            if (aStarLite != null && currentWaypoint != null)
-            {
-                temporaryWaypoints = aStarLite.FindPath(currentWaypoint.transform.position);
-            }
-            else
-            {
-                temporaryWaypoints = new List<Vector2>();
-            }
-            //If there was no path found then it will be null so if that happens just make a new empty list.
-            if (temporaryWaypoints == null)
-                temporaryWaypoints = new List<Vector2>();
-
-            stuckCheckCounter++;
-
-            isFirstTemporaryWaypoint = true;
-        }
-        else stuckCheckCounter = 0;
-
-        isRunningStuckCheck = false;
+        yield return null;
     }
+    #endregion
+
+    #region Cop Registration
     void OnEnable()
     {
-        // Nếu là cop, đảm bảo CopTargetManager tồn tại và đăng ký
         if (isCop)
         {
             if (CopTargetManager.Instance == null)
@@ -430,28 +467,22 @@ public class CarAIHandler : MonoBehaviour
                 GameObject go = new GameObject("CopTargetManager");
                 go.AddComponent<CopTargetManager>();
             }
-
             CopTargetManager.Instance.RegisterCop(this);
         }
     }
-
 
     void OnDisable()
     {
         if (isCop)
         {
-            // giải phóng claim target nếu có
             if (targetTransform != null)
             {
                 CopTargetManager.Instance?.ReleaseTarget(targetTransform, this);
                 targetTransform = null;
             }
-
-            // unregister khỏi danh sách cops
             CopTargetManager.Instance?.UnregisterCop(this);
         }
     }
-
 
     void OnDestroy()
     {
@@ -462,8 +493,8 @@ public class CarAIHandler : MonoBehaviour
                 CopTargetManager.Instance?.ReleaseTarget(targetTransform, this);
                 targetTransform = null;
             }
-
             CopTargetManager.Instance?.UnregisterCop(this);
         }
     }
+    #endregion
 }

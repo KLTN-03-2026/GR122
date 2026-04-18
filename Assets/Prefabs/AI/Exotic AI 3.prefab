@@ -257,6 +257,13 @@ MonoBehaviour:
   isAvoidingCars: 0
   skillLevel: 1
   isCop: 0
+  racePath: {fileID: 0}
+  recoverBackwardDuration: 1
+  recoverPathDuration: 5
+  stuckCheckInterval: 1
+  stuckPositionThreshold: 0.5
+  stuckRotationThreshold: 5
+  stuckRequiredCount: 3
 --- !u!114 &8353744056886700934
 MonoBehaviour:
   m_ObjectHideFlags: 0
