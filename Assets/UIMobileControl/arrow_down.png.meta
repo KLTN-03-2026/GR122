@@ -1,22 +1,13 @@
 fileFormatVersion: 2
-guid: f4efbb538725d9746a22816368f20c63
+guid: 5f5d2e87ca3da4749a98d019664f0774
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -870697331491617569
-    second: Super1_0
+      213: 1017879102727171100
+    second: arrow_down_0
   - first:
-      213: 6846556655097637223
-    second: Super1_1
-  - first:
-      213: -5330961036536598479
-    second: Super1_2
-  - first:
-      213: 3975639250338052933
-    second: Super1_3
-  - first:
-      213: -4972369253976441755
-    second: Super1_4
+      213: -3907030965988648964
+    second: arrow_down_1
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -112,13 +103,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Super1_1
+      name: arrow_down_0
       rect:
         serializedVersion: 2
-        x: 393
-        y: 97
-        width: 98
-        height: 166
+        x: 76
+        y: 102
+        width: 362
+        height: 235
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -127,30 +118,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 7696ea1d00bd30f50800000000000000
-      internalID: 6846556655097637223
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Super1_3
-      rect:
-        serializedVersion: 2
-        x: 177
-        y: 101
-        width: 74
-        height: 155
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 54bff7795de4c2730800000000000000
-      internalID: 3975639250338052933
+      spriteID: c1ca856a6ab302e00800000000000000
+      internalID: 1017879102727171100
       vertices: []
       indices: 
       edges: []
@@ -159,7 +128,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 9caf715664707b041883bdd6dd5014b6
+    spriteID: 95f1c79dc2944424c840f4aec153d2bc
     internalID: 0
     vertices: []
     indices: 
@@ -169,11 +138,8 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      Super1_0: -870697331491617569
-      Super1_1: 6846556655097637223
-      Super1_2: -5330961036536598479
-      Super1_3: 3975639250338052933
-      Super1_4: -4972369253976441755
+      arrow_down_0: 1017879102727171100
+      arrow_down_1: -3907030965988648964
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

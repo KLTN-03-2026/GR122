@@ -1,31 +1,31 @@
 fileFormatVersion: 2
-guid: 0f64ac8a63e0d004888e723691b3a805
+guid: 1b84e241ba504f443974256586c9f362
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -6424815365582245026
-    second: Hyper 1_0
+      213: 3511612360768318206
+    second: Hyper 3_0
   - first:
-      213: 8195452418924658719
-    second: Hyper 1_1
+      213: -3053209154818356560
+    second: Hyper 3_1
   - first:
-      213: 6572068964908494731
-    second: Hyper 1_2
+      213: -8230853569590628667
+    second: Hyper 3_2
   - first:
-      213: 29136865197140283
-    second: Hyper 1_3
+      213: 3232158461028091333
+    second: Hyper 3_3
   - first:
-      213: 8136787860417088107
-    second: Hyper 1_4
+      213: -5826093783237349094
+    second: Hyper 3_4
   - first:
-      213: 8137067658495540120
-    second: Hyper 1_5
+      213: 8618503650238819093
+    second: Hyper 3_5
   - first:
-      213: -3844679491456029088
-    second: Hyper 1_6
+      213: -875069661386695494
+    second: Hyper 3_6
   - first:
-      213: 8059506190898120715
-    second: Hyper 1_7
+      213: -6368183105906346347
+    second: Hyper 3_7
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -121,7 +121,29 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Hyper 1_3
+      name: Hyper 3_1
+      rect:
+        serializedVersion: 2
+        x: 170
+        y: 112
+        width: 96
+        height: 165
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0bac4164372d0a5d0800000000000000
+      internalID: -3053209154818356560
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Hyper 3_3
       rect:
         serializedVersion: 2
         x: 393
@@ -136,30 +158,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: b39a1f313d3876000800000000000000
-      internalID: 29136865197140283
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Hyper 1_5
-      rect:
-        serializedVersion: 2
-        x: 170
-        y: 112
-        width: 97
-        height: 164
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 89b32f16cebace070800000000000000
-      internalID: 8137067658495540120
+      spriteID: 5c54a5fdefeeadc20800000000000000
+      internalID: 3232158461028091333
       vertices: []
       indices: 
       edges: []
@@ -168,7 +168,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 606cefa8f703f3147bd79effddbede90
+    spriteID: 6cb78b5b75c3472479173a91f64a2d17
     internalID: 0
     vertices: []
     indices: 
@@ -178,14 +178,15 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      Hyper 1_0: -6424815365582245026
-      Hyper 1_1: 8195452418924658719
-      Hyper 1_2: 6572068964908494731
-      Hyper 1_3: 29136865197140283
-      Hyper 1_4: 8136787860417088107
-      Hyper 1_5: 8137067658495540120
-      Hyper 1_6: -3844679491456029088
-      Hyper 1_7: 8059506190898120715
+      Hyper 3_0: 3511612360768318206
+      Hyper 3_1: -3053209154818356560
+      Hyper 3_2: -8230853569590628667
+      Hyper 3_3: 3232158461028091333
+      Hyper 3_4: -5826093783237349094
+      Hyper 3_5: 8618503650238819093
+      Hyper 3_6: -875069661386695494
+      Hyper 3_7: -6368183105906346347
+      Hyper 3_8: -1637679924
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

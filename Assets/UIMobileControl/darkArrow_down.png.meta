@@ -1,22 +1,13 @@
 fileFormatVersion: 2
-guid: 7cae42cd9ae237d4cbea42ca48f91ec7
+guid: dfbe93ffe66bc054484d0daef86d9afe
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 24889927815544928
-    second: Per 2_0
+      213: -2552235951421952190
+    second: darkArrow_down_0
   - first:
-      213: -3397639505751560439
-    second: Per 2_1
-  - first:
-      213: 1125388327893503946
-    second: Per 2_2
-  - first:
-      213: -4903171145318239654
-    second: Per 2_3
-  - first:
-      213: 1082058828621634493
-    second: Per 2_4
+      213: -6996181077490264289
+    second: darkArrow_down_1
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -112,13 +103,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Per 2_1
+      name: darkArrow_down_0
       rect:
         serializedVersion: 2
-        x: 413
-        y: 95
-        width: 98
-        height: 170
+        x: 76
+        y: 100
+        width: 362
+        height: 235
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -127,30 +118,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 90f28d8fed829d0d0800000000000000
-      internalID: -3397639505751560439
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Per 2_3
-      rect:
-        serializedVersion: 2
-        x: 159
-        y: 99
-        width: 90
-        height: 161
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: a527c5a42df64fbb0800000000000000
-      internalID: -4903171145318239654
+      spriteID: 24f638cace2a49cd0800000000000000
+      internalID: -2552235951421952190
       vertices: []
       indices: 
       edges: []
@@ -159,7 +128,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: a4811b579245a8f4c9c533fe0563302b
+    spriteID: b458d2f4f302d704cb03a1da9d87f5f7
     internalID: 0
     vertices: []
     indices: 
@@ -169,11 +138,8 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      Per 2_0: 24889927815544928
-      Per 2_1: -3397639505751560439
-      Per 2_2: 1125388327893503946
-      Per 2_3: -4903171145318239654
-      Per 2_4: 1082058828621634493
+      darkArrow_down_0: -2552235951421952190
+      darkArrow_down_1: -6996181077490264289
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

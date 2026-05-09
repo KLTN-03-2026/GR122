@@ -59,6 +59,9 @@ TagManager:
   - name: Particles
     uniqueID: 1279642891
     locked: 0
+  - name: Effects
+    uniqueID: 948931051
+    locked: 0
   - name: Building
     uniqueID: 2887101895
     locked: 0

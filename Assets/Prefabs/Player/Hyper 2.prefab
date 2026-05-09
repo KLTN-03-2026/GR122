@@ -670,8 +670,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 31f2e4511b22b46438cb240f0160a988, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CarColorHandler
-  bodyRenderer: {fileID: 5595705649360035861}
-  outlineRenderer: {fileID: 8038942487106299407}
+  bodyRenderer: {fileID: 8038942487106299407}
+  outlineRenderer: {fileID: 5595705649360035861}
   headlightRenderer: {fileID: 0}
   windowRenderer: {fileID: 0}
   defaultColor: {r: 1, g: 1, b: 1, a: 1}
@@ -5821,12 +5821,13 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 10
-  m_Sprite: {fileID: 29136865197140283, guid: 0f64ac8a63e0d004888e723691b3a805, type: 3}
+  m_Sprite: {fileID: -3053209154818356560, guid: 1b84e241ba504f443974256586c9f362,
+    type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 1.6307693, y: 2.676923}
+  m_Size: {x: 1.4769231, y: 2.5384614}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
@@ -16292,13 +16293,13 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 10
-  m_Sprite: {fileID: 8137067658495540120, guid: 0f64ac8a63e0d004888e723691b3a805,
+  m_Sprite: {fileID: 3232158461028091333, guid: 1b84e241ba504f443974256586c9f362,
     type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 1.4923077, y: 2.523077}
+  m_Size: {x: 1.6307693, y: 2.676923}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1

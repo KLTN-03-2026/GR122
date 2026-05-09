@@ -1,22 +1,31 @@
 fileFormatVersion: 2
-guid: a0e809f5c5eeade4da5acf66e8538063
+guid: bd1cd317634709342976e9bd83280761
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 3871637278826576179
-    second: Performen_0
+      213: -1470228420425942165
+    second: Exotic2 re_0
   - first:
-      213: 772564293225258597
-    second: Performen_1
+      213: 131947769157218540
+    second: Exotic2 re_1
   - first:
-      213: 6591089069562755194
-    second: Performen_2
+      213: -8459465145269929132
+    second: Exotic2 re_2
   - first:
-      213: -2069543183269280970
-    second: Performen_3
+      213: -6944701161799462728
+    second: Exotic2 re_3
   - first:
-      213: -6536716071363168723
-    second: Performen_4
+      213: 4333233907143702423
+    second: Exotic2 re_4
+  - first:
+      213: -67899361324613746
+    second: Exotic2 re_5
+  - first:
+      213: 5907525088373280217
+    second: Exotic2 re_6
+  - first:
+      213: 3343139491501791577
+    second: Exotic2 re_7
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -112,13 +121,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Performen_1
+      name: Exotic2 re_0
       rect:
         serializedVersion: 2
-        x: 379
-        y: 97
-        width: 98
-        height: 166
+        x: 121
+        y: 93
+        width: 106
+        height: 174
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -127,20 +136,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 56e97d7a123b8ba00800000000000000
-      internalID: 772564293225258597
+      spriteID: b6bf3dd8a03b89be0800000000000000
+      internalID: -1470228420425942165
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Performen_3
+      name: Exotic2 re_7
       rect:
         serializedVersion: 2
-        x: 172
-        y: 101
-        width: 89
-        height: 157
+        x: 435
+        y: 97
+        width: 82
+        height: 165
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -149,8 +158,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 63347e190718743e0800000000000000
-      internalID: -2069543183269280970
+      spriteID: 9595b81a7a7356e20800000000000000
+      internalID: 3343139491501791577
       vertices: []
       indices: 
       edges: []
@@ -159,7 +168,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: f9968219058bacb448f857af26553d0b
+    spriteID: d404ce8dde162b14485c1df80ff6fb02
     internalID: 0
     vertices: []
     indices: 
@@ -169,11 +178,15 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      Performen_0: 3871637278826576179
-      Performen_1: 772564293225258597
-      Performen_2: 6591089069562755194
-      Performen_3: -2069543183269280970
-      Performen_4: -6536716071363168723
+      Exotic2 re_0: -1470228420425942165
+      Exotic2 re_1: 131947769157218540
+      Exotic2 re_2: -8459465145269929132
+      Exotic2 re_3: -6944701161799462728
+      Exotic2 re_4: 4333233907143702423
+      Exotic2 re_5: -67899361324613746
+      Exotic2 re_6: 5907525088373280217
+      Exotic2 re_7: 3343139491501791577
+      Exotic2 re_8: -740194680
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

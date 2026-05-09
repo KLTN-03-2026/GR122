@@ -16,7 +16,7 @@ public class GarageColorSelector : MonoBehaviour
     public Button leftButton;
     public Button rightButton;
     public Button selectButton;
-    public Button closeButton;           // Nút đóng (thoát garage)
+    public Button closeButton;
     public Text selectButtonText;
 
     [Header("Settings")]
@@ -24,7 +24,7 @@ public class GarageColorSelector : MonoBehaviour
     public string selectedColorKey = "car_selected_color_";
 
     [Header("References")]
-    public GameObject carSelectorPanel;  // Panel chọn xe
+    public GameObject carSelectorPanel;
 
     // Runtime
     int displayStart = 0;
@@ -33,33 +33,26 @@ public class GarageColorSelector : MonoBehaviour
     public GameObject currentPreviewCar = null;
     Color currentPreviewColor = Color.white;
     Color savedColor = Color.white;
+    Color originalColor = Color.white;
+    bool hasChanges = false;
 
     void OnEnable()
     {
-        // Ẩn panel chọn xe khi mở chọn màu
         if (carSelectorPanel != null)
             carSelectorPanel.SetActive(false);
-
-        if (leftButton != null) leftButton.onClick.RemoveAllListeners();
-        if (rightButton != null) rightButton.onClick.RemoveAllListeners();
-        if (selectButton != null) selectButton.onClick.RemoveAllListeners();
-        if (closeButton != null) closeButton.onClick.RemoveAllListeners();
 
         if (leftButton != null) leftButton.onClick.AddListener(OnLeft);
         if (rightButton != null) rightButton.onClick.AddListener(OnRight);
         if (selectButton != null) selectButton.onClick.AddListener(OnSelectPressed);
         if (closeButton != null) closeButton.onClick.AddListener(OnClosePressed);
 
-        if (slotButtons != null)
+        for (int i = 0; i < slotButtons.Length; i++)
         {
-            for (int i = 0; i < slotButtons.Length; i++)
+            int idx = i;
+            if (slotButtons[idx] != null)
             {
-                int closureI = i;
-                if (slotButtons[i] != null)
-                {
-                    slotButtons[i].onClick.RemoveAllListeners();
-                    slotButtons[i].onClick.AddListener(() => OnSlotClicked(closureI));
-                }
+                slotButtons[idx].onClick.RemoveAllListeners();
+                slotButtons[idx].onClick.AddListener(() => OnSlotClicked(idx));
             }
         }
 
@@ -71,14 +64,19 @@ public class GarageColorSelector : MonoBehaviour
 
     void OnDisable()
     {
-        if (leftButton != null) leftButton.onClick.RemoveAllListeners();
-        if (rightButton != null) rightButton.onClick.RemoveAllListeners();
-        if (selectButton != null) selectButton.onClick.RemoveAllListeners();
-        if (closeButton != null) closeButton.onClick.RemoveAllListeners();
-        if (slotButtons != null)
+        // Khôi phục màu nếu chưa bấm Chọn
+        if (!hasChanges && currentPreviewCar != null)
         {
-            foreach (var b in slotButtons) if (b != null) b.onClick.RemoveAllListeners();
+            var handler = currentPreviewCar.GetComponentInChildren<CarColorHandler>();
+            if (handler != null)
+            {
+                handler.SetBodyColor(originalColor);
+                Debug.Log("[GarageColorSelector] Khôi phục màu gốc: " + originalColor);
+            }
         }
+        
+        if (carSelectorPanel != null)
+            carSelectorPanel.SetActive(true);
     }
 
     void OnLeft()
@@ -115,21 +113,20 @@ public class GarageColorSelector : MonoBehaviour
             {
                 var color = catalog.Get(absIdx);
                 img.color = color.colorValue;
-                img.color = new Color(img.color.r, img.color.g, img.color.b, 1);
                 
                 if (color.thumbnail != null)
                     img.sprite = color.thumbnail;
                 else
                     img.sprite = null;
 
-                bool unlocked = IsUnlocked(color);
+                bool unlocked = IsColorUnlocked(color);
                 if (lockGO != null) lockGO.SetActive(!unlocked);
             }
         }
         UpdateSelectedUI();
     }
 
-    bool IsUnlocked(ColorInfo color)
+    bool IsColorUnlocked(ColorInfo color)
     {
         if (color == null) return false;
         if (color.unlockedByDefault) return true;
@@ -137,7 +134,7 @@ public class GarageColorSelector : MonoBehaviour
         return PlayerPrefs.GetInt(key, 0) == 1;
     }
 
-    void SetUnlocked(ColorInfo color, bool unlocked)
+    void SetColorUnlocked(ColorInfo color, bool unlocked)
     {
         if (color == null) return;
         string key = "color_unlocked_" + currentCarId + "_" + color.id;
@@ -145,73 +142,50 @@ public class GarageColorSelector : MonoBehaviour
         PlayerPrefs.Save();
     }
 
-  void OnSlotClicked(int slotIndex)
-{
-    int absIdx = displayStart + slotIndex;
-    if (absIdx < 0 || catalog == null || absIdx >= catalog.Count) return;
-
-    selectedAbsoluteIndex = absIdx;
-    UpdateSelectedUI();
-    
-    var color = catalog.Get(selectedAbsoluteIndex);
-    if (color == null) return;
-    
-    // TÌM LẠI currentPreviewCar MỖI LẦN CLICK
-    if (currentPreviewCar == null)
+    void OnSlotClicked(int slotIndex)
     {
-        currentPreviewCar = GameObject.FindGameObjectWithTag("Player Racer");
-    }
-    
-    if (currentPreviewCar != null)
-    {
-        Debug.Log("[GarageColorSelector] Preview màu: " + color.displayName);
-        currentPreviewColor = color.colorValue;
-        
-        // TÌM CarColorHandler (có thể trong children)
-        var handler = currentPreviewCar.GetComponent<CarColorHandler>();
-        if (handler == null)
+        // Tìm lại xe nếu bị null
+        if (currentPreviewCar == null || !currentPreviewCar.activeInHierarchy)
         {
-            handler = currentPreviewCar.GetComponentInChildren<CarColorHandler>();
+            currentPreviewCar = GameObject.FindGameObjectWithTag("Player Racer");
+            if (currentPreviewCar == null) return;
         }
+        
+        int absIdx = displayStart + slotIndex;
+        if (absIdx < 0 || catalog == null || absIdx >= catalog.Count) return;
+
+        selectedAbsoluteIndex = absIdx;
+        UpdateSelectedUI();
+        
+        var color = catalog.Get(selectedAbsoluteIndex);
+        if (color == null) return;
+        
+        // Tìm CarColorHandler trong children
+        var handler = currentPreviewCar.GetComponentInChildren<CarColorHandler>();
         
         if (handler != null)
         {
+            currentPreviewColor = color.colorValue;
             handler.SetBodyColor(currentPreviewColor);
-            Debug.Log("[GarageColorSelector] Đã preview màu thành công!");
+            hasChanges = true;
+            Debug.Log("[GarageColorSelector] Preview màu: " + color.displayName);
         }
         else
         {
-            Debug.LogError("[GarageColorSelector] Vẫn không tìm thấy CarColorHandler trên " + currentPreviewCar.name);
-            // Liệt kê các component trên xe để debug
-            var allComponents = currentPreviewCar.GetComponents<Component>();
-            foreach (var comp in allComponents)
-            {
-                Debug.Log("Component trên xe: " + comp.GetType().Name);
-            }
+            Debug.LogError("[GarageColorSelector] Không tìm thấy CarColorHandler!");
         }
     }
-    else
-    {
-        Debug.LogError("[GarageColorSelector] currentPreviewCar bị NULL!");
-    }
-}
 
     void UpdateSelectedUI()
     {
-        if (catalog == null)
-        {
-            if (selectButtonText != null) selectButtonText.text = "Chọn";
-            return;
-        }
-
-        if (selectedAbsoluteIndex < 0 || selectedAbsoluteIndex >= catalog.Count)
+        if (catalog == null || selectedAbsoluteIndex < 0 || selectedAbsoluteIndex >= catalog.Count)
         {
             if (selectButtonText != null) selectButtonText.text = "Chọn";
             return;
         }
 
         var color = catalog.Get(selectedAbsoluteIndex);
-        bool unlocked = IsUnlocked(color);
+        bool unlocked = IsColorUnlocked(color);
         
         if (selectButtonText != null)
         {
@@ -223,96 +197,79 @@ public class GarageColorSelector : MonoBehaviour
     }
 
     public void OnSelectPressed()
-{
-    Debug.Log("[GarageColorSelector] OnSelectPressed - Bắt đầu");
-    
-    if (selectedAbsoluteIndex < 0 || selectedAbsoluteIndex >= catalog.Count) return;
-    
-    var color = catalog.Get(selectedAbsoluteIndex);
-    if (color == null) return;
-
-    Debug.Log("[GarageColorSelector] Màu chọn: " + color.displayName);
-
-    // Mua và lưu màu
-    bool unlocked = IsColorUnlocked(color);
-    if (!unlocked)
     {
-        bool ok = MoneyManager.Instance.TrySpend(color.price);
-        if (!ok)
-        {
-            Debug.Log("[GarageColorSelector] Không đủ tiền");
-            return;
-        }
-        SetColorUnlocked(color, true);
-        RefreshSlots();
-        UpdateSelectedUI();
-    }
-    
-    string key = selectedColorKey + currentCarId;
-    PlayerPrefs.SetString(key, color.id);
-    PlayerPrefs.Save();
-    
-    // ===== QUAN TRỌNG: Preview màu lên xe =====
-    Debug.Log("[GarageColorSelector] currentPreviewCar = " + (currentPreviewCar != null ? currentPreviewCar.name : "NULL"));
-    
-    if (currentPreviewCar == null)
-    {
-        // Thử tìm lại xe preview
-        currentPreviewCar = GameObject.FindGameObjectWithTag("Player Racer");
-        Debug.Log("[GarageColorSelector] Tìm lại xe: " + (currentPreviewCar != null ? currentPreviewCar.name : "vẫn NULL"));
-    }
-    
-    if (currentPreviewCar != null)
-    {
-        var handler = currentPreviewCar.GetComponent<CarColorHandler>();
-        Debug.Log("[GarageColorSelector] CarColorHandler = " + (handler != null ? "CÓ" : "KHÔNG"));
+        if (selectedAbsoluteIndex < 0 || selectedAbsoluteIndex >= catalog.Count) return;
         
-        if (handler != null)
+        var color = catalog.Get(selectedAbsoluteIndex);
+        if (color == null) return;
+
+        bool unlocked = IsColorUnlocked(color);
+        
+        if (!unlocked)
         {
-            handler.SetBodyColor(color.colorValue);
-            Debug.Log("[GarageColorSelector] Đã gọi SetBodyColor với màu: " + color.colorValue);
+            bool ok = MoneyManager.Instance.TrySpend(color.price);
+            if (!ok)
+            {
+                Debug.Log("[GarageColorSelector] Không đủ tiền");
+                return;
+            }
+            SetColorUnlocked(color, true);
+            RefreshSlots();
+            UpdateSelectedUI();
         }
-        else
+        
+        // Lưu màu
+        string key = selectedColorKey + currentCarId;
+        PlayerPrefs.SetString(key, color.id);
+        PlayerPrefs.Save();
+        
+        // Cập nhật màu gốc và đánh dấu đã thay đổi
+        originalColor = color.colorValue;
+        hasChanges = true;
+        
+        // Preview màu lên xe
+        if (currentPreviewCar != null)
         {
-            // Thử tìm trong children
-            handler = currentPreviewCar.GetComponentInChildren<CarColorHandler>();
-            Debug.Log("[GarageColorSelector] Tìm trong children: " + (handler != null ? "CÓ" : "KHÔNG"));
-            if (handler != null) handler.SetBodyColor(color.colorValue);
+            var handler = currentPreviewCar.GetComponentInChildren<CarColorHandler>();
+            if (handler != null)
+            {
+                handler.SetBodyColor(color.colorValue);
+            }
         }
+        
+        Debug.Log("[GarageColorSelector] Đã chọn và lưu màu: " + color.displayName);
     }
-    
-    Debug.Log("[GarageColorSelector] Hoàn thành");
-}
 
     void OnClosePressed()
     {
-        // THOÁT GARAGE - ĐÓNG TẤT CẢ
         gameObject.SetActive(false);
         
-        // Hiện lại panel chọn xe
         if (carSelectorPanel != null)
             carSelectorPanel.SetActive(true);
         
-        // TODO: Gọi hàm thoát garage ở đây nếu cần
         Debug.Log("[GarageColorSelector] Đóng garage");
     }
 
     public void OpenPanel(string carId, GameObject previewCar)
-    {   
-        Debug.Log("[GarageColorSelector] OpenPanel - carId: " + carId);
-    
-    currentCarId = carId;
-    currentPreviewCar = previewCar;
-    
-    // Kiểm tra previewCar có hợp lệ không
-    if (currentPreviewCar == null)
     {
-        Debug.LogError("[GarageColorSelector] previewCar bị NULL!");
-        // Thử tìm lại
-        currentPreviewCar = GameObject.FindGameObjectWithTag("Player Racer");
-    }
         currentCarId = carId;
         currentPreviewCar = previewCar;
+        hasChanges = false;
+        
+        // Lưu màu gốc của xe
+        if (currentPreviewCar != null)
+        {
+            var handler = currentPreviewCar.GetComponentInChildren<CarColorHandler>();
+            if (handler != null)
+            {
+                originalColor = handler.GetBodyColor();
+                Debug.Log("[GarageColorSelector] Màu gốc của xe: " + originalColor);
+            }
+            else
+            {
+                Debug.LogError("[GarageColorSelector] Không tìm thấy CarColorHandler!");
+            }
+        }
         
         // Ẩn panel chọn xe
         if (carSelectorPanel != null)
@@ -356,25 +313,13 @@ public class GarageColorSelector : MonoBehaviour
         // Preview màu đã lưu lên xe
         if (previewCar != null)
         {
-            var handler = previewCar.GetComponent<CarColorHandler>();
-            if (handler != null) handler.SetBodyColor(savedColor);
+            var handler = previewCar.GetComponentInChildren<CarColorHandler>();
+            if (handler != null)
+            {
+                handler.SetBodyColor(savedColor);
+            }
         }
         
         gameObject.SetActive(true);
     }
-    bool IsColorUnlocked(ColorInfo color)
-{
-    if (color == null) return false;
-    if (color.unlockedByDefault) return true;
-    string key = "color_unlocked_" + currentCarId + "_" + color.id;
-    return PlayerPrefs.GetInt(key, 0) == 1;
-}
-
-void SetColorUnlocked(ColorInfo color, bool unlocked)
-{
-    if (color == null) return;
-    string key = "color_unlocked_" + currentCarId + "_" + color.id;
-    PlayerPrefs.SetInt(key, unlocked ? 1 : 0);
-    PlayerPrefs.Save();
-}
 }

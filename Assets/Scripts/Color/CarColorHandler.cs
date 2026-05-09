@@ -37,7 +37,12 @@ public class CarColorHandler : MonoBehaviour
     
     void Start()
     {
-        currentColor = defaultColor;
+        // Lấy màu hiện tại từ bodyRenderer
+        if (bodyRenderer != null)
+            currentColor = bodyRenderer.color;
+        else
+            currentColor = defaultColor;
+        
         SetBodyColor(currentColor);
     }
     
@@ -49,7 +54,14 @@ public class CarColorHandler : MonoBehaviour
         currentColor = newColor;
         
         if (bodyRenderer != null)
+        {
             bodyRenderer.color = newColor;
+            Debug.Log("[CarColorHandler] Đã đổi màu thành: " + newColor);
+        }
+        else
+        {
+            Debug.LogError("[CarColorHandler] bodyRenderer bị null! Không thể đổi màu!");
+        }
     }
     
     /// <summary>
@@ -57,6 +69,9 @@ public class CarColorHandler : MonoBehaviour
     /// </summary>
     public Color GetBodyColor()
     {
+        if (bodyRenderer != null)
+            return bodyRenderer.color;
+        
         return currentColor;
     }
     

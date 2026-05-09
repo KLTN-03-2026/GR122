@@ -16,8 +16,7 @@ MonoBehaviour:
   - id: white
     displayName: "Tr\u1EAFng"
     colorValue: {r: 1, g: 0.94905657, b: 0.94905657, a: 1}
-    thumbnail: {fileID: -8809194687540901041, guid: 071c68375b893ea4abf47cd301490a21,
-      type: 3}
+    thumbnail: {fileID: 0}
     price: 0
     unlockedByDefault: 1
   - id: red

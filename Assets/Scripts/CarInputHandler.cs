@@ -21,14 +21,22 @@ public class CarInputHandler : MonoBehaviour
 
     // Update is called once per frame and is frame dependent
     void Update()
-    {
-        Vector2 inputVector = Vector2.zero;
+{
+    Vector2 inputVector = Vector2.zero;
 
-        //Get input from Unity's input system.
-        inputVector.x = Input.GetAxis("Horizontal");
-        inputVector.y = Input.GetAxis("Vertical");
+    // Keyboard input
+    float keyboardH = Input.GetAxis("Horizontal");
+    float keyboardV = Input.GetAxis("Vertical");
 
-        //Send the input to the car controller.
-        topDownCarController.SetInputVector(inputVector);
-    }
+    // Mobile input
+    float mobileH = MobileInput.Horizontal;
+    float mobileV = MobileInput.Vertical;
+
+    // Combine input
+    inputVector.x = Mathf.Clamp(keyboardH + mobileH, -1f, 1f);
+    inputVector.y = Mathf.Clamp(keyboardV + mobileV, -1f, 1f);
+
+    // Send input to car controller
+    topDownCarController.SetInputVector(inputVector);
+}
 }
