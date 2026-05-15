@@ -91,7 +91,7 @@ public class GarageIcon : MonoBehaviour
             }
             else
             {
-                if (Input.GetKeyDown(activationKey) || MobileInput.GetEnterDown())
+                if (Input.GetKeyDown(activationKey))
                     TryOpenGarage(playerObj);
                 return;
             }
@@ -106,7 +106,7 @@ public class GarageIcon : MonoBehaviour
             {
                 playerInside = true;
                 playerObj = player;
-                if (Input.GetKeyDown(activationKey) || MobileInput.GetEnterDown()) TryOpenGarage(player);
+                if (Input.GetKeyDown(activationKey)) TryOpenGarage(player);
                 return;
             }
         }
@@ -117,7 +117,7 @@ public class GarageIcon : MonoBehaviour
             {
                 playerInside = true;
                 playerObj = player;
-                if (Input.GetKeyDown(activationKey) || MobileInput.GetEnterDown()) TryOpenGarage(player);
+                if (Input.GetKeyDown(activationKey)) TryOpenGarage(player);
                 return;
             }
         }
@@ -134,6 +134,8 @@ public class GarageIcon : MonoBehaviour
 
     void TryOpenGarage(GameObject player)
     {
+        if (WantedSystem.Instance != null && !WantedSystem.Instance.CanEnterGarage())
+            return;        
         if (player == null) return;
 
         // store original player reference for safe-keeping (will be used on exit if preview hides it)

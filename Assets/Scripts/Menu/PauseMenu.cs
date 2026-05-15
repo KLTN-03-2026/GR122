@@ -85,10 +85,11 @@ public class PauseMenu : MonoBehaviour
     /// </summary>
     public void Home()
     {
-        // Ensure Pause flag cleared before leaving
-        IsPaused = false;
-
-        // restore timescale to normal when leaving (race code may re-set if necessary)
+        if (WantedSystem.Instance != null && WantedSystem.Instance.IsChaseActive)
+        {
+            WantedSystem.Instance.OnTryExitToMenu();
+            return;
+        }
         Time.timeScale = 1f;
         SceneManager.LoadScene("Main Menu");
     }

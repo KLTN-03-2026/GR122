@@ -10,18 +10,21 @@ TagManager:
   - AICop
   - FinishLine
   - Player Collision
+  - AI Traffic
+  - AI Cop
+  - Race Barrier
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - Player
   - Water
   - UI
-  - 
-  - 
+  - AI Traffic Cop
+  - Race Barrier
   - Car
   - MiniMapIcon
-  - 
+  - AI Traffic and Cop
   - 
   - 
   - 
@@ -58,9 +61,6 @@ TagManager:
     locked: 0
   - name: Particles
     uniqueID: 1279642891
-    locked: 0
-  - name: Effects
-    uniqueID: 948931051
     locked: 0
   - name: Building
     uniqueID: 2887101895

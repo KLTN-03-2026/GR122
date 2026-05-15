@@ -52,5 +52,5 @@
         "temp/": true,
         "Temp/": true
     },
-    "dotnet.defaultSolution": "Street-Racer.sln"
+    "dotnet.defaultSolution": "Top Down Car.sln"
 }

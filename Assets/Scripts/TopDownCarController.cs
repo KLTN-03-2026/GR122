@@ -56,6 +56,12 @@ public class TopDownCarController : MonoBehaviour
         ApplySteering();
     }
 
+    public void SetEnabled(bool enabled)
+    {
+        this.enabled = enabled;
+        if (!enabled && carRigidbody2D != null) carRigidbody2D.simulated = false;
+        else if (enabled && carRigidbody2D != null) carRigidbody2D.simulated = true;
+    }    
     void ApplyEngineForce()
     {
         //Don't let the player brake while in the air, but we still allow some drag so it can be slowed slightly. 

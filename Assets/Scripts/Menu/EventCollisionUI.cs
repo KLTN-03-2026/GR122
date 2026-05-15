@@ -2,9 +2,8 @@ using UnityEngine;
 
 /// <summary>
 /// Robust EventCollisionUI:
-/// - Accept trigger on Event Icon (this script should be on Event Icon with Collider2D (isTrigger = true))
-/// - Detect player even when tag is on root or on Rigidbody object or on collider child.
-/// - Safe null checks and debug logs to help trace problems.
+/// - Chỉ player có tag "Player Racer" mới kích hoạt canvas.
+/// - AI traffic dù có TopDownCarController cũng không ảnh hưởng.
 /// </summary>
 public class EventCollisionUI : MonoBehaviour
 {
@@ -19,7 +18,6 @@ public class EventCollisionUI : MonoBehaviour
         if (eventCanvas != null)
             eventCanvas.SetActive(false);
 
-        // sanity warning
         var col = GetComponent<Collider2D>();
         if (col == null)
             Debug.LogWarning("[EventCollisionUI] No Collider2D found on this GameObject. Add one and set Is Trigger = true.");
@@ -32,10 +30,9 @@ public class EventCollisionUI : MonoBehaviour
         if (IsPlayerCollider(other))
         {
             if (eventCanvas != null)
-            {
                 eventCanvas.SetActive(true);
-            }
-            else Debug.LogWarning("[EventCollisionUI] eventCanvas not assigned.");
+            else
+                Debug.LogWarning("[EventCollisionUI] eventCanvas not assigned.");
         }
     }
 
@@ -44,9 +41,7 @@ public class EventCollisionUI : MonoBehaviour
         if (IsPlayerCollider(other))
         {
             if (eventCanvas != null)
-            {
                 eventCanvas.SetActive(false);
-            }
         }
     }
 
@@ -54,27 +49,16 @@ public class EventCollisionUI : MonoBehaviour
     {
         if (other == null) return false;
 
-        // 1) check the collider's GameObject directly
+        // Kiểm tra tag trực tiếp trên GameObject của collider
         if (other.gameObject.CompareTag(playerTag)) return true;
 
-        // 2) check attachedRigidbody's GameObject (if collider is part of child and rigidbody on parent)
+        // Kiểm tra trên rigidbody (nếu collider là con của player nhưng rigidbody ở parent)
         if (other.attachedRigidbody != null && other.attachedRigidbody.gameObject.CompareTag(playerTag)) return true;
 
-        // 3) check root transform (if tag is on top-level prefab root)
+        // Kiểm tra trên root transform (phòng trường hợp tag được gán ở prefab root)
         if (other.transform.root != null && other.transform.root.gameObject.CompareTag(playerTag)) return true;
 
-        // 4) fallback: try to detect player by common component name (TopDownCarController)
-        var comp = other.GetComponentInParent<MonoBehaviour>();
-        if (comp != null)
-        {
-            // crude check: if root has TopDownCarController component
-            var tdc = other.GetComponentInParent<TopDownCarController>();
-            if (tdc != null) return true;
-        }
-
-        // optional debug (uncomment if you need more info)
-        // Debug.Log("[EventCollisionUI] Trigger hit by: " + other.gameObject.name + " (root: " + other.transform.root.name + ")");
-
+        // KHÔNG dùng TopDownCarController để nhận diện, vì AI traffic cũng có component này
         return false;
     }
 }

@@ -5,18 +5,23 @@ using System.Linq;
 
 public class CarAIHandler : MonoBehaviour
 {
-    public enum AIMode { followPlayer, followWaypoints, followMouse };
+    public enum AIMode { followPlayer, followWaypoints, followMouse, trafficMode };
     public enum PathMode { Normal, Recover }
+    [Header("Cop Detection (for Patrol mode)")]
+    public float detectionRadius = 10f;      // Khoảng cách phát hiện Player
+    private bool hasReportedDetection = false;    
 
     [Header("AI settings")]
     public AIMode aiMode;
     public float maxSpeed = 16;
+    public float originalMaxSpeed;    
     public bool isAvoidingCars = true;
     [Range(0.0f, 1.0f)]
     public float skillLevel = 1.0f;
 
     [Header("Cop settings")]
     public bool isCop = false;
+    
 
     [Header("Recovery settings")]
     public RacePath racePath;
@@ -24,14 +29,20 @@ public class CarAIHandler : MonoBehaviour
     public float recoverPathDuration = 5.0f;
 
     [Header("Stuck detection")]
-    public float stuckCheckInterval = 1.0f;      // Thời gian giữa các lần kiểm tra
-    public float stuckPositionThreshold = 0.5f;  // Nếu di chuyển dưới ngưỡng này thì coi như stuck
-    public float stuckRotationThreshold = 5.0f;  // Nếu xoay dưới ngưỡng này (độ) thì coi như stuck
-    public int stuckRequiredCount = 3;            // Số lần kiểm tra liên tiếp bị stuck để kích hoạt recovery
+    public float stuckCheckInterval = 1.0f;
+    public float stuckPositionThreshold = 0.5f;
+    public float stuckRotationThreshold = 5.0f;
+    public int stuckRequiredCount = 3;
+
+    [Header("Traffic Mode")]
+    public WaypointNode trafficStartNode;     // waypoint spawn lần đầu
+    public float trafficMinSpeed = 5f;
+    public float trafficMaxSpeed = 12f;
+    public float trafficTurnSpeed = 2.5f;
 
     // Local variables
     Vector3 targetPosition = Vector3.zero;
-    Transform targetTransform = null;
+    public Transform targetTransform = null;
     float originalMaximumSpeed = 0;
 
     // Stuck handling mới
@@ -41,7 +52,7 @@ public class CarAIHandler : MonoBehaviour
     int stuckCount = 0;
     bool isCheckingStuck = true;
 
-    // Temporary waypoints (cho stuck cũ - giữ lại để tương thích)
+    // Temporary waypoints (cho stuck cũ - giữ để tương thích)
     bool isRunningStuckCheck = false;
     bool isFirstTemporaryWaypoint = false;
     List<Vector2> temporaryWaypoints = new List<Vector2>();
@@ -63,6 +74,9 @@ public class CarAIHandler : MonoBehaviour
     bool isBackingUp = false;
     float backupTimer = 0f;
 
+    // Traffic specific
+    bool isTrafficModeInitialized = false;
+
     // Components
     PolygonCollider2D polygonCollider2D;
     TopDownCarController topDownCarController;
@@ -70,15 +84,16 @@ public class CarAIHandler : MonoBehaviour
 
     void Awake()
     {
+        originalMaxSpeed = maxSpeed;
         topDownCarController = GetComponent<TopDownCarController>();
         aStarLite = GetComponent<AStarLite>();
         polygonCollider2D = GetComponentInChildren<PolygonCollider2D>();
         originalMaximumSpeed = maxSpeed;
 
-        if (racePath == null)
+        if (racePath == null && aiMode != AIMode.trafficMode)
             racePath = FindObjectOfType<RacePath>();
 
-        if (racePath != null)
+        if (racePath != null && aiMode != AIMode.trafficMode)
         {
             normalWaypoints = racePath.NormalWaypointNodes;
             recoverWaypoints = racePath.RecoverWaypointNodes;
@@ -93,21 +108,60 @@ public class CarAIHandler : MonoBehaviour
     void Start()
     {
         SetMaxSpeedBasedOnSkillLevel(maxSpeed);
-        if (normalWaypoints != null && normalWaypoints.Length > 0)
-            currentWaypoint = FindClosestWayPoint(normalWaypoints);
-
-        // Khởi tạo lastPosition và lastRotationZ
+        if (aiMode == AIMode.trafficMode)
+        {
+            InitializeTrafficMode();
+        }
+        else
+        {
+            if (normalWaypoints != null && normalWaypoints.Length > 0)
+                currentWaypoint = FindClosestWayPoint(normalWaypoints);
+        }
         lastPosition = transform.position;
         lastRotationZ = transform.rotation.eulerAngles.z;
         stuckTimer = stuckCheckInterval;
     }
 
+    void InitializeTrafficMode()
+    {
+        if (trafficStartNode != null)
+        {
+            currentWaypoint = trafficStartNode;
+            previousWaypoint = currentWaypoint;
+            // Tốc độ ngẫu nhiên
+            maxSpeed = Random.Range(trafficMinSpeed, trafficMaxSpeed);
+            originalMaximumSpeed = maxSpeed;
+            // Điều chỉnh turn factor (tuỳ chọn)
+            if (topDownCarController != null)
+                topDownCarController.turnFactor = trafficTurnSpeed;
+        }
+        else
+        {
+            Debug.LogWarning("[CarAIHandler] Traffic mode but no trafficStartNode assigned!");
+            enabled = false;
+        }
+        isTrafficModeInitialized = true;
+    }
+
+
     void FixedUpdate()
     {
         Vector2 inputVector = Vector2.zero;
-
-        // Kiểm tra stuck dựa trên transform (chỉ khi không đang recovery)
-        if (!isRecovering && isCheckingStuck)
+        if (aiMode == AIMode.trafficMode && isCop && !hasReportedDetection && WantedSystem.Instance != null && !WantedSystem.Instance.IsChaseActive)
+        {
+            GameObject player = GameObject.FindGameObjectWithTag("Player Racer");
+            if (player != null)
+            {
+                float dist = Vector3.Distance(transform.position, player.transform.position);
+                if (dist <= detectionRadius)
+                {
+                    hasReportedDetection = true;
+                    Debug.Log($"[CarAIHandler] Patrol cop detected player! Distance={dist}. Calling OnPatrolDetectedPlayer.");
+                    WantedSystem.Instance.OnPatrolDetectedPlayer();
+                }
+            }
+        }
+        if (!isRecovering && isCheckingStuck && aiMode != AIMode.trafficMode)
             CheckStuckByTransform();
 
         if (isRecovering)
@@ -132,6 +186,9 @@ public class CarAIHandler : MonoBehaviour
                 case AIMode.followMouse:
                     FollowMousePosition();
                     break;
+                case AIMode.trafficMode:
+                    FollowTrafficPath();
+                    break;
             }
         }
 
@@ -141,7 +198,7 @@ public class CarAIHandler : MonoBehaviour
         topDownCarController.SetInputVector(inputVector);
     }
 
-    #region Stuck Detection mới dùng transform
+    #region Stuck Detection
     void CheckStuckByTransform()
     {
         stuckTimer -= Time.fixedDeltaTime;
@@ -160,7 +217,7 @@ public class CarAIHandler : MonoBehaviour
                 if (stuckCount >= stuckRequiredCount && !isRecovering)
                 {
                     StartRecovery();
-                    stuckCount = 0; // reset sau khi kích hoạt
+                    stuckCount = 0;
                 }
             }
             else
@@ -202,7 +259,7 @@ public class CarAIHandler : MonoBehaviour
         {
             if (currentWaypoint == null && recoverWaypoints.Length > 0)
                 currentWaypoint = FindClosestWayPoint(recoverWaypoints);
-            FollowWaypoints();
+            FollowWaypoints(); // dùng logic waypoint bình thường
         }
     }
 
@@ -213,7 +270,6 @@ public class CarAIHandler : MonoBehaviour
         isBackingUp = true;
         backupTimer = recoverBackwardDuration;
         temporaryWaypoints.Clear();
-        // Dừng mọi coroutine stuck cũ nếu có
         if (isRunningStuckCheck) StopCoroutine(StuckCheckCO());
         isRunningStuckCheck = false;
         stuckCount = 0;
@@ -235,7 +291,22 @@ public class CarAIHandler : MonoBehaviour
         isRecovering = false;
         isBackingUp = false;
         currentPathMode = PathMode.Normal;
-        if (normalWaypoints != null && normalWaypoints.Length > 0)
+
+        if (normalWaypoints != null && normalWaypoints.Length > 0 && racePath != null)
+        {
+            WaypointNode next = racePath.GetNextNormalWaypoint(transform.position);
+            if (next != null)
+            {
+                currentWaypoint = next;
+                previousWaypoint = currentWaypoint;
+            }
+            else
+            {
+                currentWaypoint = FindClosestWayPoint(normalWaypoints);
+                previousWaypoint = currentWaypoint;
+            }
+        }
+        else if (normalWaypoints != null && normalWaypoints.Length > 0)
         {
             currentWaypoint = FindClosestWayPoint(normalWaypoints);
             previousWaypoint = currentWaypoint;
@@ -244,8 +315,8 @@ public class CarAIHandler : MonoBehaviour
         {
             currentWaypoint = null;
         }
+
         stuckCount = 0;
-        // Reset last position để tránh stuck ngay sau khi hồi phục
         lastPosition = transform.position;
         lastRotationZ = transform.rotation.eulerAngles.z;
         stuckTimer = stuckCheckInterval;
@@ -346,6 +417,45 @@ public class CarAIHandler : MonoBehaviour
         Vector3 worldPosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         targetPosition = worldPosition;
     }
+
+    void FollowTrafficPath()
+    {
+        if (!isTrafficModeInitialized || currentWaypoint == null) return;
+
+        targetPosition = currentWaypoint.transform.position;
+        float distance = (targetPosition - transform.position).magnitude;
+
+        if (distance <= currentWaypoint.minDistanceToReachWaypoint)
+        {
+            if (currentWaypoint.nextWaypointNode != null && currentWaypoint.nextWaypointNode.Length > 0)
+            {
+                // Chọn ngẫu nhiên một next waypoint
+                int r = Random.Range(0, currentWaypoint.nextWaypointNode.Length);
+                WaypointNode next = currentWaypoint.nextWaypointNode[r];
+                if (next != null)
+                {
+                    previousWaypoint = currentWaypoint;
+                    currentWaypoint = next;
+                }
+                else
+                {
+                    // Fallback: giữ waypoint hiện tại (sẽ bị kẹt, nhưng hiếm)
+                    Debug.LogWarning($"[Traffic] Null next waypoint at {currentWaypoint.name}");
+                }
+            }
+            else
+            {
+                // Waypoint cụt: tìm waypoint khác gần đó để tiếp tục (tránh kẹt)
+                var nearby = FindObjectsOfType<WaypointNode>()
+                    .Where(w => w != currentWaypoint && Vector3.Distance(w.transform.position, transform.position) < 20f)
+                    .ToList();
+                if (nearby.Count > 0)
+                {
+                    currentWaypoint = nearby[Random.Range(0, nearby.Count)];
+                }
+            }
+        }
+    }
     #endregion
 
     #region Helpers
@@ -397,7 +507,7 @@ public class CarAIHandler : MonoBehaviour
     }
     #endregion
 
-    #region Avoidance & Stuck (cũ giữ lại để tương thích nếu cần)
+    #region Avoidance
     Vector2 FindNearestPointOnLine(Vector2 lineStartPosition, Vector2 lineEndPosition, Vector2 point)
     {
         Vector2 lineHeadingVector = (lineEndPosition - lineStartPosition);
@@ -450,9 +560,9 @@ public class CarAIHandler : MonoBehaviour
         newVectorToTarget = vectorToTarget;
     }
 
-    // Coroutine cũ vẫn giữ nhưng không dùng nữa, có thể bỏ nhưng để tránh lỗi tham chiếu
     IEnumerator StuckCheckCO()
     {
+        // Giữ lại nhưng không dùng
         yield return null;
     }
     #endregion

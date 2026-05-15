@@ -9,6 +9,7 @@ public class CarSelectionManager : MonoBehaviour
 
     IEnumerator Start()
     {
+        // đợi 1 frame để cho Unity hoàn tất khởi tạo các assembly / camera
         yield return null;
 
         if (catalog == null) yield break;
@@ -16,14 +17,19 @@ public class CarSelectionManager : MonoBehaviour
         string id = PlayerPrefs.GetString(selectedKey, "");
         if (string.IsNullOrEmpty(id))
         {
+            // không có selection, cố gắng bind camera đến player hiện tại (nếu có)
             var existing = GameObject.FindGameObjectWithTag(playerTag);
-            if (existing != null) CinemachineTargetBinder.SetTargetStatic(existing.transform);
+            if (existing != null)
+            {
+                CinemachineTargetBinder.SetTargetStatic(existing.transform);
+            }
             yield break;
         }
 
         int idx = catalog.IndexOfId(id);
-        if (idx < 0)
+        if (idx < 0) 
         {
+            // không tìm thấy trong catalog -> bind existing
             var fallback = GameObject.FindGameObjectWithTag(playerTag);
             if (fallback != null) CinemachineTargetBinder.SetTargetStatic(fallback.transform);
             yield break;
@@ -37,12 +43,13 @@ public class CarSelectionManager : MonoBehaviour
             yield break;
         }
 
+        // tìm player hiện tại để nhận vị trí / parent
         var playerObj = GameObject.FindGameObjectWithTag(playerTag);
         if (playerObj == null)
         {
+            // nếu không có player, instantiate trực tiếp
             var newPlayer = Instantiate(info.prefab, Vector3.zero, Quaternion.identity);
             newPlayer.tag = playerTag;
-            ApplySavedColor(newPlayer, info.id);  // THÊM DÒNG NÀY
             CinemachineTargetBinder.SetTargetStatic(newPlayer.transform);
             yield break;
         }
@@ -51,38 +58,13 @@ public class CarSelectionManager : MonoBehaviour
         Quaternion rot = playerObj.transform.rotation;
         Transform parent = playerObj.transform.parent;
 
+        // destroy old object và instantiate new selected prefab
         Destroy(playerObj);
 
         var newPlayerInstance = Instantiate(info.prefab, pos, rot, parent);
         newPlayerInstance.tag = playerTag;
-        ApplySavedColor(newPlayerInstance, info.id);  // THÊM DÒNG NÀY
+
+        // bind camera cho newPlayer (an toàn vì đã chờ 1 frame)
         CinemachineTargetBinder.SetTargetStatic(newPlayerInstance.transform);
-    }
-
-    // HÀM MỚI: Áp dụng màu đã lưu cho xe
-    void ApplySavedColor(GameObject car, string carId)
-    {
-        var colorHandler = car.GetComponentInChildren<CarColorHandler>();
-        if (colorHandler == null) return;
-
-        string colorKey = "car_selected_color_" + carId;
-        string savedColorId = PlayerPrefs.GetString(colorKey, "");
-        if (string.IsNullOrEmpty(savedColorId)) return;
-
-        // Tìm ColorCatalog (có thể load từ Resources hoặc tham chiếu)
-        ColorCatalog colorCatalog = Resources.Load<ColorCatalog>("ColorCatalog");
-        if (colorCatalog == null)
-        {
-            Debug.LogWarning("Không tìm thấy ColorCatalog trong Resources!");
-            return;
-        }
-
-        int colorIdx = colorCatalog.IndexOfId(savedColorId);
-        if (colorIdx >= 0)
-        {
-            var colorInfo = colorCatalog.Get(colorIdx);
-            colorHandler.SetBodyColor(colorInfo.colorValue);
-            Debug.Log("[CarSelectionManager] Đã áp dụng màu " + colorInfo.displayName + " cho xe " + carId);
-        }
     }
 }

@@ -176,7 +176,7 @@ public class RaceEventIcon : MonoBehaviour
             }
             else
             {
-                if (Input.GetKeyDown(activationKey) || MobileInput.GetEnterDown())
+                if (Input.GetKeyDown(activationKey))
                     TryActivate(playerInsideObj);
                 return;
             }
@@ -190,7 +190,7 @@ public class RaceEventIcon : MonoBehaviour
             {
                 if (activationCollider.bounds.Contains(player.transform.position))
                 {
-                    if (Input.GetKeyDown(activationKey) || MobileInput.GetEnterDown())
+                    if (Input.GetKeyDown(activationKey))
                         TryActivate(player);
                     return;
                 }
@@ -203,7 +203,7 @@ public class RaceEventIcon : MonoBehaviour
         float dist = Vector2.Distance(fallbackPlayer.transform.position, transform.position);
         if (dist <= activationDistance)
         {
-            if (Input.GetKeyDown(activationKey) || MobileInput.GetEnterDown())
+            if (Input.GetKeyDown(activationKey))
                 TryActivate(fallbackPlayer);
         }
     }

@@ -162,4 +162,32 @@ public class RacePath : MonoBehaviour
         t = Mathf.Clamp01(t);
         return a + ab * t;
     }
+
+    /// <summary>
+    /// Tìm index của waypoint tiếp theo trên normal path dựa vào vị trí hiện tại.
+    /// Trả về -1 nếu không tìm thấy (khi xe đã ở sau waypoint cuối).
+    /// </summary>
+    public int GetNextWaypointIndex(Vector3 worldPos)
+    {
+        if (waypoints == null || waypoints.Length == 0) return -1;
+        float currentDist = GetDistanceAlongPath(worldPos, false);
+        // Tìm waypoint đầu tiên có cumulative distance > currentDist (chặn trước)
+        for (int i = 0; i < cumulativeNormal.Length; i++)
+        {
+            if (cumulativeNormal[i] > currentDist + 0.1f)
+                return i;
+        }
+        // Nếu không tìm thấy (ở gần cuối hoặc cuối path), trả về waypoint cuối cùng
+        return waypoints.Length - 1;
+    }
+
+    /// <summary>
+    /// Lấy WaypointNode tiếp theo trên normal path, dựa vào vị trí hiện tại.
+    /// </summary>
+    public WaypointNode GetNextNormalWaypoint(Vector3 worldPos)
+    {
+        int idx = GetNextWaypointIndex(worldPos);
+        if (idx < 0 || idx >= waypoints.Length) return null;
+        return waypoints[idx]?.GetComponent<WaypointNode>();
+    }
 }

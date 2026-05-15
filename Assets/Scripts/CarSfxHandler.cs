@@ -26,6 +26,29 @@ public class CarSfxHandler : MonoBehaviour
     void Awake()
     {
         topDownCarController = GetComponentInParent<TopDownCarController>();
+
+        // Cấu hình âm thanh 3D cho AI (không phải player)
+        if (!gameObject.CompareTag("Player Racer"))
+        {
+            Configure3DAudio();
+        }
+    }
+
+    void Configure3DAudio()
+    {
+        // Lấy tất cả AudioSource trên GameObject này và con cháu
+        AudioSource[] sources = GetComponentsInChildren<AudioSource>(true);
+        foreach (var src in sources)
+        {
+            src.spatialBlend = 1f;                    // Chế độ 3D
+            src.rolloffMode = AudioRolloffMode.Linear; // Giảm tuyến tính về 0 tại maxDistance
+            src.minDistance = 7f;                     // Bắt đầu giảm sau 7 đơn vị
+            src.maxDistance = 35f;                    // Hoàn toàn im lặng sau 35 đơn vị
+            src.dopplerLevel = 0f;                    // Tắt doppler (không cần)
+            
+            // (Tuỳ chọn) Để giảm đột ngột có thể chỉnh thêm spread
+            // src.spread = 30;
+        }
     }
 
     // Start is called before the first frame update
@@ -106,6 +129,4 @@ public class CarSfxHandler : MonoBehaviour
         if (!carHitAudioSource.isPlaying)
             carHitAudioSource.Play();
     }
-
-
 }
