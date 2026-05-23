@@ -61,6 +61,11 @@ public class RaceEventIcon : MonoBehaviour
     [Tooltip("Amount of cash awarded to the player when they finish this race.")]
     public int rewardAmount = 0;
 
+    [Header("Event Locking")]
+    public string eventId;               // Ví dụ: "Street", "Performance", "Super", "Exotic", "Hyper"
+    public string requiredEventId;       // ID của event cần hoàn thành trước (để trống nếu không cần)
+    public string lockMessage = "Hãy chiến thắng Event trước đó để mở khóa Event này.";
+    public float lockMessageDuration = 5f;    
     // runtime state
     bool hasActivated = false;
     bool playerInside = false;
@@ -91,6 +96,8 @@ public class RaceEventIcon : MonoBehaviour
 
     void Awake()
     {
+        // Reset global freeze flag mỗi khi một RaceEventIcon được tạo (tránh ảnh hưởng từ lần chơi trước)
+        GlobalFreezeRequestedByRace = false;        
         iconRenderer = GetComponent<SpriteRenderer>();
 
         // register checkpoints owner & index if they are assigned
@@ -217,8 +224,23 @@ public class RaceEventIcon : MonoBehaviour
     void TryActivate(GameObject player)
     {
         if (hasActivated && singleUse) return;
+        // Kiểm tra khóa event trước khi cho phép bắt đầu
+        if (!IsUnlocked())
+        {
+            if (WantedSystem.Instance != null)
+                WantedSystem.Instance.ShowTemporaryMessage(lockMessage, lockMessageDuration);
+            else
+                Debug.LogWarning("[RaceEventIcon] Cannot unlock race, but WantedSystem not found.");
+            return;
+        }        
         StartCoroutine(StartRaceRoutine(player));
     }
+
+    private bool IsUnlocked()
+    {
+        if (string.IsNullOrEmpty(requiredEventId)) return true;
+        return PlayerPrefs.GetInt("race_completed_" + requiredEventId, 0) == 1;
+    }    
 
     void OnTriggerEnter2D(Collider2D other)
     {
@@ -500,6 +522,13 @@ public class RaceEventIcon : MonoBehaviour
                 Debug.LogWarning("[RaceEventIcon] MoneyManager not available or failed to add money.");
                 awardedAmount = 0;
             }
+            // Đánh dấu event này đã được hoàn thành (chiến thắng)
+            if (!string.IsNullOrEmpty(eventId))
+            {
+                PlayerPrefs.SetInt("race_completed_" + eventId, 1);
+                PlayerPrefs.Save();
+                Debug.Log($"[RaceEventIcon] Event {eventId} completed (first place).");
+            }            
         }
         else
         {

@@ -91,7 +91,7 @@ public class GarageIcon : MonoBehaviour
             }
             else
             {
-                if (Input.GetKeyDown(activationKey))
+                if (Input.GetKeyDown(activationKey)|| MobileInput.GetEnterDown())
                     TryOpenGarage(playerObj);
                 return;
             }
@@ -106,7 +106,7 @@ public class GarageIcon : MonoBehaviour
             {
                 playerInside = true;
                 playerObj = player;
-                if (Input.GetKeyDown(activationKey)) TryOpenGarage(player);
+                if (Input.GetKeyDown(activationKey)|| MobileInput.GetEnterDown()) TryOpenGarage(player);
                 return;
             }
         }
@@ -117,7 +117,7 @@ public class GarageIcon : MonoBehaviour
             {
                 playerInside = true;
                 playerObj = player;
-                if (Input.GetKeyDown(activationKey)) TryOpenGarage(player);
+                if (Input.GetKeyDown(activationKey)|| MobileInput.GetEnterDown()) TryOpenGarage(player);
                 return;
             }
         }

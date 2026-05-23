@@ -14,7 +14,23 @@ public class PauseMenu : MonoBehaviour
 
     // Public static flag để các hệ thống khác (vd: countdown) biết game đang Pause.
     public static bool IsPaused { get; private set; } = false;
+    void Awake()
+    {
+        // Reset static pause flag khi scene được load (tránh treo countdown)
+        IsPaused = false;
+        // Đảm bảo thời gian game bình thường nếu không có race yêu cầu đóng băng
+        if (!RaceEventIcon.GlobalFreezeRequestedByRace)
+            Time.timeScale = 1f;
+    }
 
+    void OnDestroy()
+    {
+        // Reset static flag khi object bị hủy (khi rời scene)
+        IsPaused = false;
+        // Phục hồi time scale nếu cần
+        if (!RaceEventIcon.GlobalFreezeRequestedByRace)
+            Time.timeScale = 1f;
+    }
     void Update()
     {
         // Toggle pause when pressing ESC (once per keydown)

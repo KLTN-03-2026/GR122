@@ -98,10 +98,17 @@ public class NewGameButton : MonoBehaviour
         // small wait to ensure file IO finishes before scene load
         yield return null;
 
-        // 4) Load Open World scene (build index)
+        // 4) Load Open World scene (build index) với loading screen
         try
         {
-            SceneManager.LoadScene(openWorldBuildIndex);
+            // 👇 THAY DÒNG SceneManager.Loadscene BẰNG DÒNG NÀY
+            if (LoadingManager.Instance != null)
+                LoadingManager.Instance.LoadScene(openWorldBuildIndex);
+            else
+            {
+                Debug.LogWarning("[NewGameButton] LoadingManager not found, fallback to direct load");
+                SceneManager.LoadScene(openWorldBuildIndex);
+            }
         }
         catch (Exception ex)
         {

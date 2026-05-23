@@ -4,10 +4,10 @@ using UnityEngine;
 
 public class CarInputHandler : MonoBehaviour
 {
-    //Components
+    // Components
     TopDownCarController topDownCarController;
 
-    //Awake is called when the script instance is being loaded.
+    // Awake is called when the script instance is being loaded
     void Awake()
     {
         topDownCarController = GetComponent<TopDownCarController>();
@@ -16,23 +16,32 @@ public class CarInputHandler : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        
+
     }
+
     public void SetEnabled(bool enabled)
     {
         this.enabled = enabled;
-    }    
+    }
 
-    // Update is called once per frame and is frame dependent
+    // Update is called once per frame
     void Update()
     {
         Vector2 inputVector = Vector2.zero;
 
-        //Get input from Unity's input system.
-        inputVector.x = Input.GetAxis("Horizontal");
-        inputVector.y = Input.GetAxis("Vertical");
+        // Keyboard input
+        float keyboardH = Input.GetAxis("Horizontal");
+        float keyboardV = Input.GetAxis("Vertical");
 
-        //Send the input to the car controller.
+        // Mobile input
+        float mobileH = MobileInput.Horizontal;
+        float mobileV = MobileInput.Vertical;
+
+        // Combine both inputs
+        inputVector.x = Mathf.Clamp(keyboardH + mobileH, -1f, 1f);
+        inputVector.y = Mathf.Clamp(keyboardV + mobileV, -1f, 1f);
+
+        // Send input to car
         topDownCarController.SetInputVector(inputVector);
     }
 }

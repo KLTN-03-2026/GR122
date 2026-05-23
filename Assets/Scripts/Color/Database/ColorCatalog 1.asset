@@ -1,0 +1,217 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7bf4bf2e95f45e741978ecea11d92a1e, type: 3}
+  m_Name: ColorCatalog 1
+  m_EditorClassIdentifier: Assembly-CSharp::ColorCatalog
+  colors:
+  - id: white
+    displayName: "Tr\u1EAFng"
+    colorValue: {r: 1, g: 0.94905657, b: 0.94905657, a: 1}
+    thumbnail: {fileID: 0}
+    price: 0
+    unlockedByDefault: 1
+  - id: red
+    displayName: "\u0110\u1ECF"
+    colorValue: {r: 0.9, g: 0.2, b: 0.2, a: 1}
+    thumbnail: {fileID: -3452036017326080715, guid: 958a496103f7d09438e4517ff585c97b,
+      type: 3}
+    price: 0
+    unlockedByDefault: 1
+  - id: blue
+    displayName: "Xanh d\u01B0\u01A1ng"
+    colorValue: {r: 0.2, g: 0.4, b: 0.9, a: 1}
+    thumbnail: {fileID: 8367681547621469090, guid: d416833706611f34cbda134fac3a87af,
+      type: 3}
+    price: 0
+    unlockedByDefault: 1
+  - id: green
+    displayName: "Xanh l\xE1"
+    colorValue: {r: 0.2, g: 0.7, b: 0.2, a: 1}
+    thumbnail: {fileID: 3896306229334088597, guid: d58841f213560eb44971c71d60070c74,
+      type: 3}
+    price: 0
+    unlockedByDefault: 1
+  - id: yellow
+    displayName: "V\xE0ng"
+    colorValue: {r: 0.95, g: 0.85, b: 0.2, a: 1}
+    thumbnail: {fileID: -661844355561137779, guid: 98abf009fa0705b409947f623d5dd922,
+      type: 3}
+    price: 0
+    unlockedByDefault: 1
+  - id: black
+    displayName: "\u0110en"
+    colorValue: {r: 0.1, g: 0.1, b: 0.1, a: 1}
+    thumbnail: {fileID: 2923792608668227194, guid: 214cfc5af835d084e8d4de0477fb9082,
+      type: 3}
+    price: 0
+    unlockedByDefault: 1
+  - id: pink
+    displayName: "H\u1ED3ng"
+    colorValue: {r: 1, g: 0.6, b: 0.8, a: 1}
+    thumbnail: {fileID: 6785755889859705386, guid: e8156d32be0d779438140ba913dd1670,
+      type: 3}
+    price: 3000
+    unlockedByDefault: 0
+  - id: pastel_blue
+    displayName: "Xanh nh\u1EA1t"
+    colorValue: {r: 0.6, g: 0.8, b: 1, a: 1}
+    thumbnail: {fileID: -5334637214539828154, guid: bc31b5e2a5169e049979a500ce215e06,
+      type: 3}
+    price: 3000
+    unlockedByDefault: 0
+  - id: pastel_green
+    displayName: "Xanh l\xE1 nh\u1EA1t"
+    colorValue: {r: 0.7, g: 0.9, b: 0.7, a: 1}
+    thumbnail: {fileID: -6016733984486061419, guid: d81cbe3bdd487f34496bbde17c709687,
+      type: 3}
+    price: 3000
+    unlockedByDefault: 0
+  - id: pastel_purple
+    displayName: "T\xEDm nh\u1EA1t"
+    colorValue: {r: 0.85, g: 0.7, b: 0.95, a: 1}
+    thumbnail: {fileID: -502115391282801168, guid: 9fa8f161c84a61f48a4527377a250165,
+      type: 3}
+    price: 3000
+    unlockedByDefault: 0
+  - id: peach
+    displayName: "\u0110\xE0o"
+    colorValue: {r: 1, g: 0.8, b: 0.6, a: 1}
+    thumbnail: {fileID: 3637923666789532126, guid: 3b051f8868fbd414f9ca31385565de65,
+      type: 3}
+    price: 3000
+    unlockedByDefault: 0
+  - id: neon_red
+    displayName: "Neon \u0111\u1ECF"
+    colorValue: {r: 1, g: 0.2, b: 0.2, a: 1}
+    thumbnail: {fileID: 574985143081299105, guid: 394ee6c2b42838e428200ca41e853ed2,
+      type: 3}
+    price: 8000
+    unlockedByDefault: 0
+  - id: neon_green
+    displayName: Neon xanh
+    colorValue: {r: 0.2, g: 1, b: 0.2, a: 1}
+    thumbnail: {fileID: 6554532213455520585, guid: c1e0ea628372c504d86932c28116789b,
+      type: 3}
+    price: 8000
+    unlockedByDefault: 0
+  - id: neon_blue
+    displayName: "Neon d\u01B0\u01A1ng"
+    colorValue: {r: 0.2, g: 0.5, b: 1, a: 1}
+    thumbnail: {fileID: -8276575774693722664, guid: 5652b299544f5904c83872812ec1bd79,
+      type: 3}
+    price: 8000
+    unlockedByDefault: 0
+  - id: neon_pink
+    displayName: "Neon h\u1ED3ng"
+    colorValue: {r: 1, g: 0.2, b: 0.8, a: 1}
+    thumbnail: {fileID: 3788217885839361270, guid: 5a6f095b2e1583d40a7554af94181f37,
+      type: 3}
+    price: 8000
+    unlockedByDefault: 0
+  - id: neon_yellow
+    displayName: "Neon v\xE0ng"
+    colorValue: {r: 1, g: 0.9, b: 0.1, a: 1}
+    thumbnail: {fileID: -5465345721108094418, guid: 179bd27f0a844804c8fd00e29e89b7e1,
+      type: 3}
+    price: 8000
+    unlockedByDefault: 0
+  - id: metallic_red
+    displayName: "\u0110\u1ECF metallic"
+    colorValue: {r: 0.85, g: 0.25, b: 0.25, a: 1}
+    thumbnail: {fileID: 9023042412477788257, guid: 62488f68a0f21c543b47a709ad55eaf3,
+      type: 3}
+    price: 12000
+    unlockedByDefault: 0
+  - id: metallic_blue
+    displayName: Xanh metallic
+    colorValue: {r: 0.2, g: 0.4, b: 0.85, a: 1}
+    thumbnail: {fileID: 6282181676265557742, guid: 0f9ef133c7226aa498bcfaad2d40a261,
+      type: 3}
+    price: 12000
+    unlockedByDefault: 0
+  - id: metallic_silver
+    displayName: "B\u1EA1c"
+    colorValue: {r: 0.75, g: 0.75, b: 0.8, a: 1}
+    thumbnail: {fileID: -6203672373163702998, guid: e45c8cba8a89ccc458e7d5034a250f22,
+      type: 3}
+    price: 10000
+    unlockedByDefault: 0
+  - id: metallic_gold
+    displayName: "V\xE0ng gold"
+    colorValue: {r: 0.9, g: 0.75, b: 0.2, a: 1}
+    thumbnail: {fileID: 6627320426611510602, guid: 62231cd3f3ebe984aa1ccfffe3aef422,
+      type: 3}
+    price: 15000
+    unlockedByDefault: 0
+  - id: metallic_bronze
+    displayName: "\u0110\u1ED3ng"
+    colorValue: {r: 0.8, g: 0.5, b: 0.2, a: 1}
+    thumbnail: {fileID: 3653444386265836077, guid: 2f50f4a80b3e8f146beffd3751e425de,
+      type: 3}
+    price: 13000
+    unlockedByDefault: 0
+  - id: dark_red
+    displayName: "\u0110\u1ECF \u0111\xF4"
+    colorValue: {r: 0.5, g: 0.1, b: 0.1, a: 1}
+    thumbnail: {fileID: -3575376341701881147, guid: 92ad34ffde15bc1408bb7c186ad19ad2,
+      type: 3}
+    price: 5000
+    unlockedByDefault: 0
+  - id: navy
+    displayName: Xanh navy
+    colorValue: {r: 0.1, g: 0.1, b: 0.5, a: 1}
+    thumbnail: {fileID: -7296764459148969896, guid: 6266185babdd5a144ad1ff55cb3af543,
+      type: 3}
+    price: 5000
+    unlockedByDefault: 0
+  - id: dark_green
+    displayName: "Xanh r\xEAu"
+    colorValue: {r: 0.1, g: 0.3, b: 0.1, a: 1}
+    thumbnail: {fileID: -3377280315470115824, guid: 883e9d87fcb2288459c069c3f1faae96,
+      type: 3}
+    price: 5000
+    unlockedByDefault: 0
+  - id: purple
+    displayName: "T\xEDm than"
+    colorValue: {r: 0.3, g: 0.1, b: 0.4, a: 1}
+    thumbnail: {fileID: -1784967687226267839, guid: 8f58b040828033f47bd98c8be3debbb1,
+      type: 3}
+    price: 5000
+    unlockedByDefault: 0
+  - id: dark_gray
+    displayName: "X\xE1m \u0111\u1EADm"
+    colorValue: {r: 0.3, g: 0.3, b: 0.35, a: 1}
+    thumbnail: {fileID: 7441946716845039611, guid: 006f4a986c75c29438e126e70810979f,
+      type: 3}
+    price: 4000
+    unlockedByDefault: 0
+  - id: orange
+    displayName: Cam
+    colorValue: {r: 1, g: 0.55, b: 0, a: 1}
+    thumbnail: {fileID: 932266377009675251, guid: d900dc361b9a0b649a1bff6eeb571649,
+      type: 3}
+    price: 6000
+    unlockedByDefault: 0
+  - id: cyan
+    displayName: "Xanh ng\u1ECDc"
+    colorValue: {r: 0, g: 0.8, b: 0.9, a: 1}
+    thumbnail: {fileID: -129189047281852014, guid: 68ba713230878094fa85f75a312f02b4,
+      type: 3}
+    price: 6000
+    unlockedByDefault: 0
+  - id: champagne
+    displayName: "V\xE0ng champagne"
+    colorValue: {r: 0.85, g: 0.75, b: 0.55, a: 1}
+    thumbnail: {fileID: -3252966112288638681, guid: 4974fe31322c2334d8f109abced09c0e,
+      type: 3}
+    price: 10000
+    unlockedByDefault: 0

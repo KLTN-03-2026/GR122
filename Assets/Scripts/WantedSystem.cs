@@ -401,6 +401,27 @@ public class WantedSystem : MonoBehaviour
         backupAndGarageTextObject.SetActive(true);
         if (duration > 0) StartCoroutine(HideTextAfterDelay(duration));
     }
+    /// <summary>
+    /// Hiển thị một thông báo tạm thời lên BackupAndGarageText (dùng cho RaceEvent khóa, v.v.)
+    /// </summary>
+    public void ShowTemporaryMessage(string msg, float duration)
+    {
+        if (backupAndGarageTextObject != null)
+        {
+            SetText(backupAndGarageText_TMP, backupAndGarageText_UI, msg);
+            backupAndGarageTextObject.SetActive(true);
+            if (duration > 0)
+            {
+                // Dừng coroutine cũ để tránh chồng chéo và đảm bảo thời gian mới
+                StopCoroutine("HideTextAfterDelay");
+                StartCoroutine(HideTextAfterDelay(duration));
+            }
+        }
+        else
+        {
+            Debug.LogWarning("[WantedSystem] backupAndGarageTextObject is null, cannot show message.");
+        }
+    }    
 
     IEnumerator HideTextAfterDelay(float d)
     {

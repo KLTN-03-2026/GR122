@@ -1,5 +1,24 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!243 &-9127399564189791064
+AudioMixerGroupController:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Music
+  m_AudioMixer: {fileID: 24100000}
+  m_GroupID: e5d5ee8929c30d24c975e70c76b67d7b
+  m_Children: []
+  m_Volume: 9d3293519738a4d4a81cbbbd74b07286
+  m_Pitch: d5fb74edef3d7ee4cbefc4ffc5d5f9b5
+  m_Send: 00000000000000000000000000000000
+  m_Effects:
+  - {fileID: -8463267541954671718}
+  m_UserColorIndex: 0
+  m_Mute: 0
+  m_Solo: 0
+  m_BypassEffects: 0
 --- !u!243 &-8828315218534837484
 AudioMixerGroupController:
   m_ObjectHideFlags: 0
@@ -21,6 +40,20 @@ AudioMixerGroupController:
   m_Mute: 0
   m_Solo: 0
   m_BypassEffects: 0
+--- !u!244 &-8463267541954671718
+AudioMixerEffectController:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: 
+  m_EffectID: dddcb4e24992abb4d8692db64abf39ff
+  m_EffectName: Attenuation
+  m_MixLevel: b54593db07cf3ce45bfaa69c512db263
+  m_Parameters: []
+  m_SendTarget: {fileID: 0}
+  m_EnableWetMix: 0
+  m_Bypass: 0
 --- !u!244 &-7666650094163100282
 AudioMixerEffectController:
   m_ObjectHideFlags: 3
@@ -161,6 +194,10 @@ AudioMixerController:
   m_EnableSuspend: 1
   m_UpdateMode: 0
   m_ExposedParameters:
+  - guid: f230bf54363a0a640873a3e56b594967
+    name: MasterVolume
+  - guid: 9d3293519738a4d4a81cbbbd74b07286
+    name: MusicVolume
   - guid: 08a4e5b529a27fa4cac9906e352ff1cd
     name: SFXVolume
   m_AudioMixerGroupViews:
@@ -171,6 +208,7 @@ AudioMixerController:
     - b8fde602dc07a4f4db13c0da99bcd94d
     - 2c3b67fdc02bead45a79166612fddf03
     - 618ede1b4533e0044ac343aeff09effe
+    - e5d5ee8929c30d24c975e70c76b67d7b
     name: View
   m_CurrentViewIndex: 0
   m_TargetSnapshot: {fileID: 24500006}
@@ -184,6 +222,7 @@ AudioMixerGroupController:
   m_AudioMixer: {fileID: 24100000}
   m_GroupID: 090c05f035f5e4a4c81ee1c311e6a0d0
   m_Children:
+  - {fileID: -9127399564189791064}
   - {fileID: -7390482370985784729}
   m_Volume: f230bf54363a0a640873a3e56b594967
   m_Pitch: 6b4c670ba1225fb47b42a2065b40326f
@@ -218,9 +257,10 @@ AudioMixerSnapshotController:
   m_AudioMixer: {fileID: 24100000}
   m_SnapshotID: 95b7c81795410114084af072eca8461c
   m_FloatValues:
+    9d3293519738a4d4a81cbbbd74b07286: -9.332105
     61ae8e925c369f34aa54eb2334b9410d: -0.16685188
     be6da9b364c376a41a0e5ca5be3b0582: 0.6
-    f230bf54363a0a640873a3e56b594967: -0.017639274
+    f230bf54363a0a640873a3e56b594967: 0
     08a4e5b529a27fa4cac9906e352ff1cd: 0
     5a75b6e82b1b93047bb260296b81ab49: -6.5566154
     bcebe88c0f3cd284598871cf931c14c6: -8.841784
