@@ -191,7 +191,13 @@ public class CarAIHandler : MonoBehaviour
                     break;
             }
         }
-
+        // === BẮT ĐẦU THÊM (COP SPEED SCALING) ===
+        // Nếu là cop đang ở chế độ đuổi theo player, cập nhật tốc độ dựa trên player
+        if (isCop && aiMode == AIMode.followPlayer)
+        {
+            UpdateCopSpeedBasedOnPlayer();
+        }
+        // === KẾT THÚC THÊM ===
         inputVector.x = TurnTowardTarget();
         inputVector.y = ApplyThrottleOrBrake(inputVector.x);
 
@@ -606,5 +612,28 @@ public class CarAIHandler : MonoBehaviour
             CopTargetManager.Instance?.UnregisterCop(this);
         }
     }
+    /// <summary>
+    /// Cập nhật max speed của cop luôn nhanh hơn player 2 đơn vị (dành cho chase mode)
+    /// </summary>
+    void UpdateCopSpeedBasedOnPlayer()
+    {
+        // Tìm player hiện tại bằng tag "Player Racer" (giống các script khác)
+        GameObject player = GameObject.FindGameObjectWithTag("Player Racer");
+        if (player == null) return;
+
+        // Lấy component TopDownCarController của player
+        TopDownCarController playerController = player.GetComponent<TopDownCarController>();
+        if (playerController == null) return;
+
+        float playerMaxSpeed = playerController.maxSpeed;
+        float desiredSpeed = playerMaxSpeed + 2f;
+
+        // Chỉ thay đổi nếu cần, tránh gán liên tục mỗi frame
+        if (Mathf.Abs(maxSpeed - desiredSpeed) > 0.01f)
+        {
+            maxSpeed = desiredSpeed;
+            // Không cần thay đổi originalMaxSpeed vì khi thoát chase cop sẽ bị despawn
+        }
+    }    
     #endregion
 }

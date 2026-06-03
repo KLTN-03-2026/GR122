@@ -76,7 +76,7 @@ MonoBehaviour:
     thumbnail: {fileID: -4161031970589558192, guid: 50f8cf754fca7ee4cac924af3f1c6d82,
       type: 3}
     price: 160000
-    unlockedByDefault: 1
+    unlockedByDefault: 0
   - id: 8
     displayName: Hyper 1
     prefab: {fileID: 6558350185343971735, guid: 955606d2ca86c5f428f925cc329cfd5e,
@@ -84,7 +84,7 @@ MonoBehaviour:
     thumbnail: {fileID: -6424815365582245026, guid: ed8f0a58b6298324d9fd445f690536b5,
       type: 3}
     price: 400000
-    unlockedByDefault: 1
+    unlockedByDefault: 0
   - id: 9
     displayName: Hyper 2
     prefab: {fileID: 6558350185343971735, guid: 408a1f7c2a2a3524e972a008a10fd5ce,
@@ -92,4 +92,4 @@ MonoBehaviour:
     thumbnail: {fileID: -7732045425276702371, guid: 6da49a95052de2945bdf90469d529fca,
       type: 3}
     price: 400000
-    unlockedByDefault: 1
+    unlockedByDefault: 0

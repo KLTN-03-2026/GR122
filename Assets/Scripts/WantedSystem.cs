@@ -3,7 +3,14 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using UnityEngine.SceneManagement;
-
+[System.Serializable]
+public class SpeedThresholdSetting
+{
+    [Tooltip("Ngưỡng tốc độ tối đa của player (maxSpeed). Nếu playerMaxSpeed < ngưỡng này thì áp dụng MaxChaseCops tương ứng.")]
+    public float speedThreshold = 30f;
+    [Tooltip("Số lượng Chase Cop tối đa khi playerMaxSpeed < ngưỡng này.")]
+    public int maxChaseCops = 2;
+}
 public class WantedSystem : MonoBehaviour
 {
     public static WantedSystem Instance { get; private set; }
@@ -16,6 +23,12 @@ public class WantedSystem : MonoBehaviour
     [Header("Chase Settings")]
     public int initialChasePool = 30;
     public int maxConcurrentChaseCops = 4;
+    [Header("Auto Difficulty")]
+    public bool autoAdjustChaseCountByPlayerSpeed = false;
+    public SpeedThresholdSetting[] speedThresholds;  // Mảng các ngưỡng, kéo thả trong Inspector
+    [Tooltip("Giá trị mặc định nếu không có ngưỡng nào thỏa mãn (thường là 4).")]
+    public int defaultMaxChaseCops = 4;
+    private int originalMaxConcurrentChaseCops;
     public int backupTriggerCount = 4;
     public float backupCountdownSeconds = 120f;
     public int backupAddAmount = 30;
@@ -99,7 +112,6 @@ public class WantedSystem : MonoBehaviour
 
     void Start()
     {
-        Debug.Log($"[WantedSystem] Start called. copCanvas = {(copCanvas == null ? "NULL" : copCanvas.name)}");        
         if (bustedEndButton != null) bustedEndButton.onClick.AddListener(OnBustedEndPressed);
         if (warningYesButton != null) warningYesButton.onClick.AddListener(OnWarningYes);
         if (warningNoButton != null) warningNoButton.onClick.AddListener(OnWarningNo);
@@ -108,6 +120,13 @@ public class WantedSystem : MonoBehaviour
         warningFineCanvas?.SetActive(false);
         backupAndGarageTextObject?.SetActive(false);
         currentChasePool = initialChasePool;
+        // Lưu giá trị gốc của maxConcurrentChaseCops (để phục hồi nếu tắt auto)
+        originalMaxConcurrentChaseCops = maxConcurrentChaseCops; 
+        // Sắp xếp các ngưỡng tăng dần (đảm bảo logic hoạt động đúng)
+        if (speedThresholds != null && speedThresholds.Length > 0)
+        {
+            System.Array.Sort(speedThresholds, (a, b) => a.speedThreshold.CompareTo(b.speedThreshold));
+        }               
         UpdateCopsCountUI();
         player = GameObject.FindGameObjectWithTag("Player Racer");
         playerController = player?.GetComponent<TopDownCarController>();
@@ -122,6 +141,34 @@ public class WantedSystem : MonoBehaviour
             fineAccumulated += finePerSecond * Time.deltaTime;
             UpdateFineUI();
             
+            // === BẮT ĐẦU THÊM (Auto adjust maxConcurrentChaseCops theo tốc độ player - có thể tùy chỉnh ngưỡng) ===
+            if (autoAdjustChaseCountByPlayerSpeed && playerController != null)
+            {
+                float playerMaxSpeed = playerController.maxSpeed;
+                int newMaxChase = defaultMaxChaseCops; // giá trị fallback
+
+                // Duyệt qua các ngưỡng đã được sắp xếp (theo thứ tự tăng dần)
+                // Lưu ý: Bạn nên kéo thả các mục trong Inspector theo thứ tự tăng dần của speedThreshold
+                // hoặc có thể thêm code sắp xếp ở đây (tùy chọn)
+                foreach (var setting in speedThresholds)
+                {
+                    if (playerMaxSpeed < setting.speedThreshold)
+                    {
+                        newMaxChase = setting.maxChaseCops;
+                        break; // lấy ngưỡng đầu tiên thỏa mãn
+                    }
+                }
+
+                // Chỉ gán nếu thay đổi
+                if (maxConcurrentChaseCops != newMaxChase)
+                {
+                    maxConcurrentChaseCops = newMaxChase;
+                    // Có thể log để debug
+                    // Debug.Log($"[WantedSystem] Auto adjust maxConcurrentChaseCops to {newMaxChase} (player maxSpeed={playerMaxSpeed})");
+                }
+            }
+            // === KẾT THÚC THÊM ===
+
             // Cập nhật số lượng chase cop mong muốn TRƯỚC khi có thể kết thúc chase
             int desiredChase = Mathf.Min(maxConcurrentChaseCops, currentChasePool);
             TrafficSpawner.Instance?.SetDesiredChaseCount(desiredChase);
@@ -143,7 +190,6 @@ public class WantedSystem : MonoBehaviour
                     TrafficSpawner.Instance?.SetDesiredPatrolCount(0);
                     TrafficSpawner.Instance?.SetDesiredChaseCount(0);
                     TrafficSpawner.Instance?.SetDesiredChaseCount(0);  // Đảm bảo
-                    Debug.Log("[WantedSystem] Escape cooldown ended, reset desired chase count.");
                 }
             }
         }
@@ -156,12 +202,7 @@ public class WantedSystem : MonoBehaviour
                 spawnPatrolEnabled = true;
                 Debug.Log("[WantedSystem] Busted cooldown ended, patrol spawning re-enabled.");
             }
-        }
-        // Debug: in trạng thái mỗi vài giây (tránh spam)
-        if (Time.frameCount % 60 == 0)
-        {
-            Debug.Log($"[WantedSystem] Update: isChaseActive={isChaseActive}, escapeCompleted={escapeCompleted}, spawnPatrolEnabled={spawnPatrolEnabled}, bustedCooldownActive={bustedCooldownActive}, bustedCooldownTimer={bustedCooldownTimer}");
-        }                
+        } 
         if (!isChaseActive && !escapeCompleted && spawnPatrolEnabled)
         {
             int desiredPatrol = Mathf.FloorToInt(playerCollisions / additionalCollisionsPerSpawn);
@@ -252,7 +293,6 @@ public class WantedSystem : MonoBehaviour
 
         UpdateCopsCountUI();
         copCanvas?.SetActive(true);
-        Debug.Log($"[WantedSystem] Chase started. Chase cops count: {currentChaseCount}, pool left: {currentChasePool}");
     }
 
     void UpdateBustedAndEscape()
@@ -338,7 +378,6 @@ public class WantedSystem : MonoBehaviour
         }
         // Despawn tất cả cops ngay lập tức
         TrafficSpawner.Instance?.ForceDespawnAllCops();
-        Debug.Log("[WantedSystem] Chase ended, all cops despawned.");
     }
 
     void OnBustedEndPressed()
@@ -358,7 +397,6 @@ public class WantedSystem : MonoBehaviour
         currentChasePool = initialChasePool;
         TrafficSpawner.Instance?.ForceDespawnAllCops();
         if (copCanvas != null) copCanvas.SetActive(false);
-        Debug.Log("[WantedSystem] Busted screen closed, state reset.");
     }
 
     void OnWarningYes()
@@ -378,6 +416,23 @@ public class WantedSystem : MonoBehaviour
     {
         SetText(copsCountText_TMP, copsCountText_UI, $"Cops: {currentChasePool} cars");
     }
+    /// <summary>
+    /// Giảm Chase Pool đi 1 khi một Chase Cop bị loại khỏi cuộc đuổi bắt.
+    /// Chỉ có tác dụng khi chase đang active.
+    /// </summary>
+    public void DecrementChasePool()
+    {
+        if (!isChaseActive) return;  // Chỉ giảm khi đang trong chase
+
+        currentChasePool = Mathf.Max(0, currentChasePool - 1);
+        UpdateCopsCountUI();  // Cập nhật UI hiển thị pool
+
+        // Tính lại số lượng chase cop mong muốn dựa trên pool mới
+        int desiredChase = Mathf.Min(maxConcurrentChaseCops, currentChasePool);
+        TrafficSpawner.Instance?.SetDesiredChaseCount(desiredChase);
+
+        // (Tùy chọn) Log để debug
+    }    
 
     void UpdateFineUI()
     {

@@ -34,8 +34,6 @@ public class PoliceLightBlink : MonoBehaviour
 
             // test màu để dễ thấy
             sr.color = toggle ? Color.white : Color.yellow;
-
-            Debug.Log("Đổi sang: " + sr.sprite.name);
         }
     }
 }

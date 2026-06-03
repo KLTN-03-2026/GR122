@@ -203,6 +203,7 @@ PrefabInstance:
     m_RemovedComponents:
     - {fileID: 6558350185343971739, guid: d017faad03b9aa946ab12ed85bb3607f, type: 3}
     - {fileID: 4529915907061649674, guid: d017faad03b9aa946ab12ed85bb3607f, type: 3}
+    - {fileID: -8570858534704069370, guid: d017faad03b9aa946ab12ed85bb3607f, type: 3}
     m_RemovedGameObjects:
     - {fileID: 5909329076200668030, guid: d017faad03b9aa946ab12ed85bb3607f, type: 3}
     m_AddedGameObjects:
@@ -252,8 +253,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f340a57b19e654942ad1dadc499b23bc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  detectionRadius: 10
   aiMode: 1
   maxSpeed: 41
+  originalMaxSpeed: 0
   isAvoidingCars: 0
   skillLevel: 1
   isCop: 0
@@ -264,6 +267,11 @@ MonoBehaviour:
   stuckPositionThreshold: 0.5
   stuckRotationThreshold: 5
   stuckRequiredCount: 3
+  trafficStartNode: {fileID: 0}
+  trafficMinSpeed: 5
+  trafficMaxSpeed: 12
+  trafficTurnSpeed: 2.5
+  targetTransform: {fileID: 0}
 --- !u!114 &2368398920564750102
 MonoBehaviour:
   m_ObjectHideFlags: 0

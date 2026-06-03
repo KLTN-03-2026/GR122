@@ -215,7 +215,6 @@ public class TrafficSpawner : MonoBehaviour
     public void SetDesiredChaseCount(int count)
     {
         desiredChaseCount = Mathf.Clamp(count, 0, maxChaseCops);
-        Debug.Log($"[TrafficSpawner] SetDesiredChaseCount = {desiredChaseCount}");
     }
     public List<GameObject> GetActiveChaseCops() => activeChaseCops;
 
@@ -230,7 +229,6 @@ public class TrafficSpawner : MonoBehaviour
     // Gọi các method này trong Update (cùng với ManageTraffic)
     private void ManagePatrolCops()
     {
-        Debug.Log($"[TrafficSpawner] ManagePatrolCops: desiredPatrolCount={desiredPatrolCount}, activePatrolCops.Count={activePatrolCops.Count}");        
         if (copPatrolPrefab == null) return;
         activePatrolCops.RemoveAll(c => c == null);
         Vector3 camPos = targetCamera.transform.position;
@@ -286,7 +284,6 @@ public class TrafficSpawner : MonoBehaviour
 
     private void ManageChaseCops()
     {
-        Debug.Log($"[TrafficSpawner] ManageChaseCops: activeChaseCops.Count={activeChaseCops.Count}, desiredChaseCount={desiredChaseCount}");        
         if (copChasePrefab == null) return;
         activeChaseCops.RemoveAll(c => c == null);
         GameObject player = GameObject.FindGameObjectWithTag("Player Racer");
@@ -296,6 +293,10 @@ public class TrafficSpawner : MonoBehaviour
         {
             if (Vector3.Distance(activeChaseCops[i].transform.position, player.transform.position) > chaseDespawnDistance)
             {
+                // 👇 THÊM DÒNG NÀY TRƯỚC Destroy
+                if (WantedSystem.Instance != null && WantedSystem.Instance.IsChaseActive)
+                    WantedSystem.Instance.DecrementChasePool();
+
                 Destroy(activeChaseCops[i]);
                 activeChaseCops.RemoveAt(i);
             }
@@ -354,7 +355,6 @@ public class TrafficSpawner : MonoBehaviour
         }
         desiredPatrolCount = 0;
         desiredChaseCount = activeChaseCops.Count;
-        Debug.Log($"[TrafficSpawner] Converted {activeChaseCops.Count} patrol cops to chase mode, speed restored to original.");
     }
 
     public void ForceDespawnAllCops()
@@ -368,11 +368,8 @@ public class TrafficSpawner : MonoBehaviour
             if (cop != null) Destroy(cop);
         activePatrolCops.Clear();
         activeChaseCops.Clear();
-        Debug.Log($"[TrafficSpawner] ForceDespawnAllCops: before - desiredChaseCount={desiredChaseCount}, desiredPatrolCount={desiredPatrolCount}");
         // Reset desired counts
         desiredChaseCount = 0;
         desiredPatrolCount = 0;
-        Debug.Log($"[TrafficSpawner] ForceDespawnAllCops: after reset - desiredChaseCount={desiredChaseCount}");
-        Debug.Log("[TrafficSpawner] All cops despawned and desired counts reset.");
     }     
 }

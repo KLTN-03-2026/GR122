@@ -59,134 +59,134 @@ MonoBehaviour:
     colorValue: {r: 1, g: 0.6, b: 0.8, a: 1}
     thumbnail: {fileID: 6785755889859705386, guid: e8156d32be0d779438140ba913dd1670,
       type: 3}
-    price: 3000
-    unlockedByDefault: 0
+    price: 0
+    unlockedByDefault: 1
   - id: pastel_blue
     displayName: "Xanh nh\u1EA1t"
     colorValue: {r: 0.6, g: 0.8, b: 1, a: 1}
     thumbnail: {fileID: -5334637214539828154, guid: bc31b5e2a5169e049979a500ce215e06,
       type: 3}
-    price: 3000
-    unlockedByDefault: 0
+    price: 0
+    unlockedByDefault: 1
   - id: pastel_green
     displayName: "Xanh l\xE1 nh\u1EA1t"
     colorValue: {r: 0.7, g: 0.9, b: 0.7, a: 1}
     thumbnail: {fileID: -6016733984486061419, guid: d81cbe3bdd487f34496bbde17c709687,
       type: 3}
-    price: 3000
-    unlockedByDefault: 0
+    price: 0
+    unlockedByDefault: 1
   - id: pastel_purple
     displayName: "T\xEDm nh\u1EA1t"
     colorValue: {r: 0.85, g: 0.7, b: 0.95, a: 1}
     thumbnail: {fileID: -502115391282801168, guid: 9fa8f161c84a61f48a4527377a250165,
       type: 3}
-    price: 3000
-    unlockedByDefault: 0
+    price: 0
+    unlockedByDefault: 1
   - id: peach
     displayName: "\u0110\xE0o"
     colorValue: {r: 1, g: 0.8, b: 0.6, a: 1}
     thumbnail: {fileID: 3637923666789532126, guid: 3b051f8868fbd414f9ca31385565de65,
       type: 3}
-    price: 3000
-    unlockedByDefault: 0
+    price: 0
+    unlockedByDefault: 1
   - id: neon_red
     displayName: "Neon \u0111\u1ECF"
     colorValue: {r: 1, g: 0.2, b: 0.2, a: 1}
     thumbnail: {fileID: 574985143081299105, guid: 394ee6c2b42838e428200ca41e853ed2,
       type: 3}
-    price: 8000
-    unlockedByDefault: 0
+    price: 0
+    unlockedByDefault: 1
   - id: neon_green
     displayName: Neon xanh
     colorValue: {r: 0.2, g: 1, b: 0.2, a: 1}
     thumbnail: {fileID: 6554532213455520585, guid: c1e0ea628372c504d86932c28116789b,
       type: 3}
-    price: 8000
-    unlockedByDefault: 0
+    price: 0
+    unlockedByDefault: 1
   - id: neon_blue
     displayName: "Neon d\u01B0\u01A1ng"
     colorValue: {r: 0.2, g: 0.5, b: 1, a: 1}
     thumbnail: {fileID: -8276575774693722664, guid: 5652b299544f5904c83872812ec1bd79,
       type: 3}
-    price: 8000
-    unlockedByDefault: 0
+    price: 0
+    unlockedByDefault: 1
   - id: neon_pink
     displayName: "Neon h\u1ED3ng"
     colorValue: {r: 1, g: 0.2, b: 0.8, a: 1}
     thumbnail: {fileID: 3788217885839361270, guid: 5a6f095b2e1583d40a7554af94181f37,
       type: 3}
-    price: 8000
-    unlockedByDefault: 0
+    price: 0
+    unlockedByDefault: 1
   - id: neon_yellow
     displayName: "Neon v\xE0ng"
     colorValue: {r: 1, g: 0.9, b: 0.1, a: 1}
     thumbnail: {fileID: -5465345721108094418, guid: 179bd27f0a844804c8fd00e29e89b7e1,
       type: 3}
-    price: 8000
-    unlockedByDefault: 0
+    price: 0
+    unlockedByDefault: 1
   - id: metallic_red
     displayName: "\u0110\u1ECF metallic"
     colorValue: {r: 0.85, g: 0.25, b: 0.25, a: 1}
     thumbnail: {fileID: 9023042412477788257, guid: 62488f68a0f21c543b47a709ad55eaf3,
       type: 3}
-    price: 12000
-    unlockedByDefault: 0
+    price: 0
+    unlockedByDefault: 1
   - id: metallic_blue
     displayName: Xanh metallic
     colorValue: {r: 0.2, g: 0.4, b: 0.85, a: 1}
     thumbnail: {fileID: 6282181676265557742, guid: 0f9ef133c7226aa498bcfaad2d40a261,
       type: 3}
-    price: 12000
-    unlockedByDefault: 0
+    price: 0
+    unlockedByDefault: 1
   - id: metallic_silver
     displayName: "B\u1EA1c"
     colorValue: {r: 0.75, g: 0.75, b: 0.8, a: 1}
     thumbnail: {fileID: -6203672373163702998, guid: e45c8cba8a89ccc458e7d5034a250f22,
       type: 3}
-    price: 10000
-    unlockedByDefault: 0
+    price: 0
+    unlockedByDefault: 1
   - id: metallic_gold
     displayName: "V\xE0ng gold"
     colorValue: {r: 0.9, g: 0.75, b: 0.2, a: 1}
     thumbnail: {fileID: 6627320426611510602, guid: 62231cd3f3ebe984aa1ccfffe3aef422,
       type: 3}
-    price: 15000
-    unlockedByDefault: 0
+    price: 0
+    unlockedByDefault: 1
   - id: metallic_bronze
     displayName: "\u0110\u1ED3ng"
     colorValue: {r: 0.8, g: 0.5, b: 0.2, a: 1}
     thumbnail: {fileID: 3653444386265836077, guid: 2f50f4a80b3e8f146beffd3751e425de,
       type: 3}
-    price: 13000
-    unlockedByDefault: 0
+    price: 0
+    unlockedByDefault: 1
   - id: dark_red
     displayName: "\u0110\u1ECF \u0111\xF4"
     colorValue: {r: 0.5, g: 0.1, b: 0.1, a: 1}
     thumbnail: {fileID: -3575376341701881147, guid: 92ad34ffde15bc1408bb7c186ad19ad2,
       type: 3}
-    price: 5000
-    unlockedByDefault: 0
+    price: 0
+    unlockedByDefault: 1
   - id: navy
     displayName: Xanh navy
     colorValue: {r: 0.1, g: 0.1, b: 0.5, a: 1}
     thumbnail: {fileID: -7296764459148969896, guid: 6266185babdd5a144ad1ff55cb3af543,
       type: 3}
-    price: 5000
-    unlockedByDefault: 0
+    price: 0
+    unlockedByDefault: 1
   - id: dark_green
     displayName: "Xanh r\xEAu"
     colorValue: {r: 0.1, g: 0.3, b: 0.1, a: 1}
     thumbnail: {fileID: -3377280315470115824, guid: 883e9d87fcb2288459c069c3f1faae96,
       type: 3}
-    price: 5000
-    unlockedByDefault: 0
+    price: 0
+    unlockedByDefault: 1
   - id: purple
     displayName: "T\xEDm than"
     colorValue: {r: 0.3, g: 0.1, b: 0.4, a: 1}
     thumbnail: {fileID: -1784967687226267839, guid: 8f58b040828033f47bd98c8be3debbb1,
       type: 3}
-    price: 5000
-    unlockedByDefault: 0
+    price: 0
+    unlockedByDefault: 1
   - id: dark_gray
     displayName: "X\xE1m \u0111\u1EADm"
     colorValue: {r: 0.3, g: 0.3, b: 0.35, a: 1}
@@ -213,5 +213,5 @@ MonoBehaviour:
     colorValue: {r: 0.85, g: 0.75, b: 0.55, a: 1}
     thumbnail: {fileID: -3252966112288638681, guid: 4974fe31322c2334d8f109abced09c0e,
       type: 3}
-    price: 10000
-    unlockedByDefault: 0
+    price: 0
+    unlockedByDefault: 1

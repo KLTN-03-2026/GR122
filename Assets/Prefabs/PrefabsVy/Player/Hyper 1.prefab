@@ -11037,7 +11037,7 @@ GameObject:
   - component: {fileID: 6558350185343971739}
   - component: {fileID: 1796671574}
   - component: {fileID: 4194406489685515978}
-  - component: {fileID: 610489955133754331}
+  - component: {fileID: 4943784245768520666}
   m_Layer: 0
   m_Name: Hyper 1
   m_TagString: Player Racer
@@ -11187,7 +11187,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RacerTargetable
   isPlayer: 1
---- !u!114 &610489955133754331
+--- !u!114 &4943784245768520666
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -11199,6 +11199,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5d5af162f086f1d468c68eb2c21cd924, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerCollisionHandler
+  collisionCooldown: 1
 --- !u!1 &6558350185460239946
 GameObject:
   m_ObjectHideFlags: 0

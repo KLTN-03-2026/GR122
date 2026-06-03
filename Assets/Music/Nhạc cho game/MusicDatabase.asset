@@ -14,34 +14,22 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::MusicDatabase
   tracks:
   - trackName: 
-    artist: Srav3R
-    clip: {fileID: 8300000, guid: b3162085e3a77764fb582737f6dbd116, type: 3}
+    artist: White Bat Audio - Delta City
+    clip: {fileID: 8300000, guid: c04479abe21600a4b8c85fd806ce5573, type: 3}
     note: 
   - trackName: 
-    artist: Hyper Potions & Nitro Fun
-    clip: {fileID: 8300000, guid: 6d45f82def9232e4aae0034c574d76f0, type: 3}
+    artist: White Bat Audio  - Athena
+    clip: {fileID: 8300000, guid: 524f5cbb9dd6593498e9e1ab85908116, type: 3}
     note: 
   - trackName: 
-    artist: Tokyo Machine
-    clip: {fileID: 8300000, guid: c39a98be60e86fa44b90f6a7cb6eb60d, type: 3}
+    artist: White Bat Audio  - Luminous
+    clip: {fileID: 8300000, guid: 93174c0b3e7e8eb43b09b47a16dcedfc, type: 3}
     note: 
   - trackName: 
-    artist: Tokyo Machine
-    clip: {fileID: 8300000, guid: 22a9f622edee07c40bd1d5dd789be5d8, type: 3}
+    artist: White Bat Audio - The Last Phoenix
+    clip: {fileID: 8300000, guid: 58e7c9330c2924040a6d8c902d335f23, type: 3}
     note: 
   - trackName: 
-    artist: Usao
-    clip: {fileID: 8300000, guid: 5a5f22c9a3bb5c94491a029e95ad174f, type: 3}
-    note: 
-  - trackName: 
-    artist: '@CG5 & Hyper Potions'
-    clip: {fileID: 8300000, guid: f4763c1780fc0de4cbfe9b36c843a391, type: 3}
-    note: 
-  - trackName: 
-    artist: KEN BLAST
-    clip: {fileID: 8300000, guid: f24e4346640e6ff4f8c8fb76e72efe20, type: 3}
-    note: 
-  - trackName: 
-    artist: N.I.K.O
-    clip: {fileID: 8300000, guid: 5f34f0e11572b024892d423d490f0324, type: 3}
+    artist: White Bat Audio - Millenia
+    clip: {fileID: 8300000, guid: 51191a2b8f6d91e42ad786af185a1812, type: 3}
     note: 
